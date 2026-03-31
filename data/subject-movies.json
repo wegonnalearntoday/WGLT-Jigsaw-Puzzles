@@ -1,142 +1,145 @@
-[
-  {
-    "title": "Black Panther",
-    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
-    "description": "Film spotlight on representation, Afrofuturism, and cultural impact.",
-    "keywords": [
-      "movie",
-      "afrofuturism",
-      "wakanda",
-      "representation"
-    ],
-    "quiz": [
-      {
-        "q": "Black Panther is part of which kind of film world?",
-        "choices": [
-          "A superhero film universe",
-          "A cooking show series",
-          "A nature documentary line",
-          "A western trilogy"
-        ],
-        "answer": 0,
-        "explanation": "Black Panther is a superhero film in a larger cinematic universe."
-      },
-      {
-        "q": "The fictional home nation in Black Panther is what?",
-        "choices": [
-          "Wakanda",
-          "Atlantis",
-          "Gotham",
-          "Narnia"
-        ],
-        "answer": 0,
-        "explanation": "Wakanda is the fictional African nation in the film."
-      },
-      {
-        "q": "Why is Black Panther often discussed in culture lessons?",
-        "choices": [
-          "It expanded representation in blockbuster films",
-          "It invented stop signs",
-          "It discovered a new element",
-          "It created jazz"
-        ],
-        "answer": 0,
-        "explanation": "It had a major impact on representation and cultural pride."
-      },
-      {
-        "q": "A major visual style linked to Black Panther is what?",
-        "choices": [
-          "Afrofuturism",
-          "Minimalism",
-          "Cubism only",
-          "Silent film style"
-        ],
-        "answer": 0,
-        "explanation": "The film is often linked to Afrofuturist design and storytelling."
-      },
-      {
-        "q": "What helped make Black Panther historically significant?",
-        "choices": [
-          "Its cultural and box office impact",
-          "It was the first movie ever made",
-          "It taught weather science",
-          "It replaced all cartoons"
-        ],
-        "answer": 0,
-        "explanation": "It made a major cultural and commercial impact."
-      }
-    ]
-  },
-  {
-    "title": "Hidden Figures",
-    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
-    "description": "Film about Black women mathematicians whose work supported NASA missions.",
-    "keywords": [
-      "movie",
-      "NASA",
-      "mathematics",
-      "women in STEM"
-    ],
-    "quiz": [
-      {
-        "q": "Hidden Figures tells the story of whom?",
-        "choices": [
-          "Black women mathematicians at NASA",
-          "A pirate crew",
-          "A baseball team",
-          "A royal family"
-        ],
-        "answer": 0,
-        "explanation": "The film highlights Black women mathematicians at NASA."
-      },
-      {
-        "q": "Why is Hidden Figures important in education?",
-        "choices": [
-          "It highlights overlooked contributions to science",
-          "It is only a comedy",
-          "It teaches gardening",
-          "It is about race cars"
-        ],
-        "answer": 0,
-        "explanation": "It shows key STEM contributions that were often overlooked."
-      },
-      {
-        "q": "What field is central to the film?",
-        "choices": [
-          "Mathematics and space work",
-          "Marine biology",
-          "Music production",
-          "Architecture"
-        ],
-        "answer": 0,
-        "explanation": "The story centers on math and space missions."
-      },
-      {
-        "q": "What does the film help students see?",
-        "choices": [
-          "Representation in STEM history",
-          "Only science fiction",
-          "How to cook lunch",
-          "Ancient sailing routes"
-        ],
-        "answer": 0,
-        "explanation": "It helps students see real representation in STEM history."
-      },
-      {
-        "q": "The women in Hidden Figures supported work for what agency?",
-        "choices": [
-          "NASA",
-          "FBI",
-          "USPS",
-          "NBA"
-        ],
-        "answer": 0,
-        "explanation": "The film is about women whose work supported NASA."
-      }
-    ]
-  }
-]
+{
+  "subject": "Movies",
+  "items": [
+    {
+      "title": "Black Panther",
+      "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+      "description": "Film spotlight on representation, Afrofuturism, and cultural impact.",
+      "keywords": [
+        "movie",
+        "afrofuturism",
+        "wakanda",
+        "representation"
+      ],
+      "quiz": [
+        {
+          "q": "Black Panther is part of which kind of film world?",
+          "choices": [
+            "A superhero film universe",
+            "A cooking show series",
+            "A nature documentary line",
+            "A western trilogy"
+          ],
+          "answer": 0,
+          "explanation": "Black Panther is a superhero film in a larger cinematic universe."
+        },
+        {
+          "q": "The fictional home nation in Black Panther is what?",
+          "choices": [
+            "Wakanda",
+            "Atlantis",
+            "Gotham",
+            "Narnia"
+          ],
+          "answer": 0,
+          "explanation": "Wakanda is the fictional African nation in the film."
+        },
+        {
+          "q": "Why is Black Panther often discussed in culture lessons?",
+          "choices": [
+            "It expanded representation in blockbuster films",
+            "It invented stop signs",
+            "It discovered a new element",
+            "It created jazz"
+          ],
+          "answer": 0,
+          "explanation": "It had a major impact on representation and cultural pride."
+        },
+        {
+          "q": "A major visual style linked to Black Panther is what?",
+          "choices": [
+            "Afrofuturism",
+            "Minimalism",
+            "Cubism only",
+            "Silent film style"
+          ],
+          "answer": 0,
+          "explanation": "The film is often linked to Afrofuturist design and storytelling."
+        },
+        {
+          "q": "What helped make Black Panther historically significant?",
+          "choices": [
+            "Its cultural and box office impact",
+            "It was the first movie ever made",
+            "It taught weather science",
+            "It replaced all cartoons"
+          ],
+          "answer": 0,
+          "explanation": "It made a major cultural and commercial impact."
+        }
+      ]
+    },
+    {
+      "title": "Hidden Figures",
+      "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+      "description": "Film about Black women mathematicians whose work supported NASA missions.",
+      "keywords": [
+        "movie",
+        "NASA",
+        "mathematics",
+        "women in STEM"
+      ],
+      "quiz": [
+        {
+          "q": "Hidden Figures tells the story of whom?",
+          "choices": [
+            "Black women mathematicians at NASA",
+            "A pirate crew",
+            "A baseball team",
+            "A royal family"
+          ],
+          "answer": 0,
+          "explanation": "The film highlights Black women mathematicians at NASA."
+        },
+        {
+          "q": "Why is Hidden Figures important in education?",
+          "choices": [
+            "It highlights overlooked contributions to science",
+            "It is only a comedy",
+            "It teaches gardening",
+            "It is about race cars"
+          ],
+          "answer": 0,
+          "explanation": "It shows key STEM contributions that were often overlooked."
+        },
+        {
+          "q": "What field is central to the film?",
+          "choices": [
+            "Mathematics and space work",
+            "Marine biology",
+            "Music production",
+            "Architecture"
+          ],
+          "answer": 0,
+          "explanation": "The story centers on math and space missions."
+        },
+        {
+          "q": "What does the film help students see?",
+          "choices": [
+            "Representation in STEM history",
+            "Only science fiction",
+            "How to cook lunch",
+            "Ancient sailing routes"
+          ],
+          "answer": 0,
+          "explanation": "It helps students see real representation in STEM history."
+        },
+        {
+          "q": "The women in Hidden Figures supported work for what agency?",
+          "choices": [
+            "NASA",
+            "FBI",
+            "USPS",
+            "NBA"
+          ],
+          "answer": 0,
+          "explanation": "The film is about women whose work supported NASA."
+        }
+      ]
+    }
+  ]
+}

@@ -1,18 +1,19 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>WGLT JSON Lesson Flow V2</title>
+  <title>WGLT JSON Lesson Flow V3</title>
   <style>
     :root{
       --bg:#101418;--panel:#182028;--card:#202a34;--text:#f3f6f9;--muted:#aab7c4;
       --accent:#f4b400;--accent2:#2bb673;--danger:#e24a4a;--shadow:0 12px 28px rgba(0,0,0,.35);
-      --boardSize:920px;
+      --solveSize:680px;--traySize:170px;
     }
     *{box-sizing:border-box}
     body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#0d1116,#141b22 45%,#101418);color:var(--text);min-height:100vh}
-    .wrap{max-width:1400px;margin:0 auto;padding:18px}
+    .wrap{max-width:1480px;margin:0 auto;padding:18px}
     .hero,.panel,.stage{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:24px;box-shadow:var(--shadow)}
     .hero{padding:20px;margin-bottom:18px}
     h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
@@ -21,10 +22,7 @@
     .panel,.stage{padding:18px}
     .field{margin-bottom:14px}
     label{display:block;margin-bottom:8px;font-weight:700}
-    select,button,input{
-      width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:var(--card);
-      color:var(--text);padding:12px 14px;font-size:15px
-    }
+    select,button,input{width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:var(--card);color:var(--text);padding:12px 14px;font-size:15px}
     button{cursor:pointer;font-weight:700;transition:transform .15s ease,opacity .15s ease}
     button:hover{transform:translateY(-1px)}
     button:disabled{opacity:.55;cursor:not-allowed;transform:none}
@@ -37,10 +35,7 @@
     .pill-btn{text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:12px 14px;border-radius:14px}
     .pill-btn.active{box-shadow:0 0 0 2px rgba(244,180,0,.75) inset;background:rgba(244,180,0,.12)}
     .thumb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-height:430px;overflow:auto;padding-right:4px}
-    .thumb-card{
-      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;
-      overflow:hidden;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease
-    }
+    .thumb-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease}
     .thumb-card:hover{transform:translateY(-2px)}
     .thumb-card.active{box-shadow:0 0 0 2px rgba(244,180,0,.8) inset;background:rgba(244,180,0,.10)}
     .thumb-img{aspect-ratio:1/1;background:#0b0f14;display:flex;align-items:center;justify-content:center}
@@ -60,7 +55,11 @@
     .tiny-note,.hint{color:var(--muted);font-size:14px;line-height:1.5}
     .stage-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
     .stage-label{color:var(--muted);font-size:14px}
-    .board-shell{position:relative;width:min(100%,var(--boardSize));aspect-ratio:1/1;margin:0 auto;background:radial-gradient(circle at center,rgba(255,255,255,.075),rgba(255,255,255,.03));border-radius:24px;border:2px solid rgba(255,255,255,.08);overflow:hidden}
+    .workspace{display:grid;grid-template-columns:var(--traySize) var(--solveSize) var(--traySize);gap:14px;justify-content:center;align-items:start}
+    .tray{min-height:var(--solveSize);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:10px;position:relative}
+    .tray-title{text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px}
+    .tray-box{position:relative;height:calc(var(--solveSize) - 24px);overflow:hidden;border-radius:16px;background:rgba(255,255,255,.02)}
+    .board-shell{position:relative;width:min(100%,var(--solveSize));aspect-ratio:1/1;margin:0 auto;background:radial-gradient(circle at center,rgba(255,255,255,.075),rgba(255,255,255,.03));border-radius:24px;border:2px solid rgba(255,255,255,.08);overflow:hidden}
     .board-grid{position:absolute;inset:0;display:grid;pointer-events:none;z-index:1}
     .grid-cell{border:1px dashed rgba(255,255,255,.12)}
     .board-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease;z-index:2;background:#000}
@@ -70,10 +69,11 @@
     .piece svg{display:block;overflow:visible}
     .piece path.stroke{fill:none;stroke:rgba(255,255,255,.30);stroke-width:2;pointer-events:none}
     .piece.connected path.stroke{stroke:rgba(43,182,115,.85)}
+    .tray-piece{position:absolute}
     .celebration-overlay{position:absolute;inset:0;display:none !important;align-items:center;justify-content:center;background:rgba(8,12,16,.86);z-index:50 !important;padding:18px;text-align:center}
     .celebration-overlay.show{display:flex !important}
     .celebration-card{width:min(92%,560px);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
-    .quiz-shell{width:min(100%,860px);margin:18px auto 0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:18px;display:none}
+    .quiz-shell{width:min(100%,1048px);margin:18px auto 0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:18px;display:none}
     .quiz-shell.show{display:block}
     .quiz-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
     .q-card{margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
@@ -89,15 +89,20 @@
     .loader.show{display:block}
     @keyframes pulseGlow{0%{box-shadow:0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 32px rgba(255,255,255,.35)}100%{box-shadow:0 0 0 rgba(255,255,255,0)}}
     .flash{animation:pulseGlow .55s ease}
-    @media (max-width:1100px){.layout{grid-template-columns:1fr}.board-shell{width:min(100%,94vw)}.thumb-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:1300px){
+      .workspace{grid-template-columns:1fr;justify-items:center}
+      .tray{width:min(100%,var(--solveSize));min-height:190px}
+      .tray-box{height:160px;overflow:auto;white-space:nowrap}
+    }
+    @media (max-width:1100px){.layout{grid-template-columns:1fr}.thumb-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.thumb-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <section class="hero">
-      <h1>WGLT JSON Lesson Flow V2</h1>
-      <p class="sub">Subject JSON splitting, search bar, and thumbnail cards. Built to grow without becoming a code casserole. 🎯</p>
+      <h1>WGLT JSON Lesson Flow V3</h1>
+      <p class="sub">Now with a real loose-piece tray system. Instead of squeezing pieces into the same board, singles can park in left and right trays. Much less traffic jam, much more puzzle breathing room. 🧩</p>
     </section>
 
     <div class="layout">
@@ -144,7 +149,7 @@
 
         <div class="actions">
           <button class="btn-primary" id="startBtn">Start Lesson Flow</button>
-          <button class="btn-secondary" id="edgeBtn">Move Loose Pieces to Edges</button>
+          <button class="btn-secondary" id="trayBtn">Send Loose Pieces to Trays</button>
           <button class="btn-secondary" id="showSolvedBtn">Show Hint Picture</button>
           <button class="btn-danger" id="resetBtn">Reset Lesson</button>
         </div>
@@ -168,12 +173,10 @@
         <div class="preview" id="previewBox"></div>
 
         <div class="tiny-code">
-          <strong>Folder structure:</strong><br>
-          <code>index.html</code><br>
-          <code>data/subjects-index.json</code><br>
-          <code>data/subject-black-historical-figures.json</code><br>
-          <code>data/subject-movies.json</code><br>
-          etc.
+          <strong>Tray system:</strong><br>
+          Loose single pieces get organized into left and right trays.<br>
+          Connected groups stay on the main board.<br>
+          This works much better for larger puzzle sizes than forcing edge parking inside the board.
         </div>
       </aside>
 
@@ -185,15 +188,27 @@
           </div>
         </div>
 
-        <div class="board-shell" id="boardShell">
-          <div id="boardGrid" class="board-grid"></div>
-          <video id="inlineVideo" class="board-video" playsinline controls></video>
-          <div id="piecesLayer" class="pieces-layer"></div>
-          <div id="celebrationOverlay" class="celebration-overlay">
-            <div class="celebration-card">
-              <h3 id="celebrationTitle" style="margin:0 0 8px;">Badge Unlocked</h3>
-              <div id="celebrationText" class="tiny-note">Great job.</div>
+        <div class="workspace">
+          <div class="tray">
+            <div class="tray-title">Loose Pieces Tray A</div>
+            <div id="leftTray" class="tray-box"></div>
+          </div>
+
+          <div class="board-shell" id="boardShell">
+            <div id="boardGrid" class="board-grid"></div>
+            <video id="inlineVideo" class="board-video" playsinline controls></video>
+            <div id="piecesLayer" class="pieces-layer"></div>
+            <div id="celebrationOverlay" class="celebration-overlay">
+              <div class="celebration-card">
+                <h3 id="celebrationTitle" style="margin:0 0 8px;">Badge Unlocked</h3>
+                <div id="celebrationText" class="tiny-note">Great job.</div>
+              </div>
             </div>
+          </div>
+
+          <div class="tray">
+            <div class="tray-title">Loose Pieces Tray B</div>
+            <div id="rightTray" class="tray-box"></div>
           </div>
         </div>
 
@@ -226,54 +241,18 @@
   </div>
 
   <script>
+    const STORAGE_KEY='wglt_json_v3_progress';
     const FALLBACK_INDEX = {
       subjects: [
         { subject: "Black Historical Figures & Leaders", file: "data/subject-black-historical-figures.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Movies", file: "data/subject-movies.json" },
-        { subject: "Art by Black Artists", file: "data/subject-art-by-black-artists.json" },
-        { subject: "Civil Rights & Milestone Moments", file: "data/subject-civil-rights-and-milestone-moments.json" },
-        { subject: "Sport Icons", file: "data/subject-sport-icons.json" },
-        { subject: "Cultural & Musical Heritage", file: "data/subject-cultural-and-musical-heritage.json" },
-        { subject: "Crafts and Artistry", file: "data/subject-crafts-and-artistry.json" }
+        { subject: "Movies", file: "data/subject-movies.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Art by Black Artists", file: "data/subject-art-by-black-artists.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Civil Rights & Milestone Moments", file: "data/subject-civil-rights-and-milestone-moments.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Sport Icons", file: "data/subject-sport-icons.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Cultural & Musical Heritage", file: "data/subject-cultural-and-musical-heritage.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Crafts and Artistry", file: "data/subject-crafts-and-artistry.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" }
       ]
     };
-
-    const FALLBACK_SUBJECTS = {
-      "Black Historical Figures & Leaders": {
-        subject: "Black Historical Figures & Leaders",
-        items: [
-          {
-            title: "James Baldwin",
-            imageUrl: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-            videoUrl: "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
-            description: "Complete the James Baldwin puzzle, watch the lesson clip, then answer five facts-based questions.",
-            keywords: ["writer","civil rights","author","essayist"],
-            quiz: [
-              {q:"James Baldwin was best known as which of the following?",choices:["A writer and social critic","A chemist","A baseball manager","A sculptor"],answer:0,explanation:"James Baldwin was a writer, essayist, novelist, and social critic."},
-              {q:"Which major theme appeared often in Baldwin’s work?",choices:["Race and identity","Rocket engineering only","Weather forecasting","Animal training"],answer:0,explanation:"Baldwin often wrote about race, identity, justice, and American life."},
-              {q:"James Baldwin’s work challenged what?",choices:["Social inequality and injustice","Math homework rules","Ocean maps","Cooking methods"],answer:0,explanation:"His work challenged injustice and pushed readers to confront hard truths."},
-              {q:"Baldwin’s writing is remembered because it was often described as what?",choices:["Powerful and honest","Silent and hidden","Only about sports","Entirely fictional science notes"],answer:0,explanation:"His voice was recognized as powerful, sharp, and deeply honest."},
-              {q:"Why is James Baldwin important in Black history studies?",choices:["He helped shape conversations about race and equality","He invented a video game console","He discovered a new planet","He coached a championship team"],answer:0,explanation:"Baldwin helped shape conversations about race, identity, and equality."}
-            ]
-          },
-          {
-            title: "Faith Ringgold",
-            imageUrl: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-            videoUrl: "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
-            description: "Complete the Faith Ringgold puzzle, watch the lesson clip, then answer five facts-based questions.",
-            keywords: ["artist","story quilts","author","visual art"],
-            quiz: [
-              {q:"Faith Ringgold is widely known as which of the following?",choices:["An artist and storyteller","A race car driver","A weather scientist","A pro wrestler"],answer:0,explanation:"Faith Ringgold is celebrated as an artist, writer, and storyteller."},
-              {q:"Ringgold became especially famous for creating what kind of artworks?",choices:["Story quilts","Stone pyramids","Animated films only","Laboratory charts"],answer:0,explanation:"Her story quilts combine visual art and storytelling."},
-              {q:"A major purpose of Ringgold’s art was to do what?",choices:["Tell stories about Black life and history","Teach car repair","Map the moon","Train wild animals"],answer:0,explanation:"Her work often tells stories about Black life, history, family, and culture."},
-              {q:"Faith Ringgold’s work is important because it blends art with what else?",choices:["History and identity","Only sports statistics","Fishing manuals","Computer hardware repair"],answer:0,explanation:"Her art often blends creativity with history, identity, and social themes."},
-              {q:"Why is Faith Ringgold often included in Black history and culture lessons?",choices:["Her art helps preserve stories and perspectives","She invented a submarine","She discovered a mountain range","She created a football league"],answer:0,explanation:"Her work preserves stories, perspectives, and cultural memory."}
-            ]
-          }
-        ]
-      }
-    };
-
     let SUBJECT_INDEX = FALLBACK_INDEX.subjects;
     const subjectCache = new Map();
 
@@ -285,7 +264,7 @@
     const lessonCards = document.getElementById('lessonCards');
     const difficulty = document.getElementById('difficulty');
     const startBtn = document.getElementById('startBtn');
-    const edgeBtn = document.getElementById('edgeBtn');
+    const trayBtn = document.getElementById('trayBtn');
     const showSolvedBtn = document.getElementById('showSolvedBtn');
     const resetBtn = document.getElementById('resetBtn');
     const previewBox = document.getElementById('previewBox');
@@ -296,6 +275,8 @@
     const boardGrid = document.getElementById('boardGrid');
     const piecesLayer = document.getElementById('piecesLayer');
     const inlineVideo = document.getElementById('inlineVideo');
+    const leftTray = document.getElementById('leftTray');
+    const rightTray = document.getElementById('rightTray');
     const movesStat = document.getElementById('movesStat');
     const connectedStat = document.getElementById('connectedStat');
     const totalStat = document.getElementById('totalStat');
@@ -325,9 +306,6 @@
     let quizIndex = 0, quizScore = 0, quizAnswered = false, currentQuizOrder = [], totalScoreAcrossLessons = 0, lessonsCompleted = 0, unlockedBadges = [], autoAdvanceTimer = null;
 
     function setStatus(msg){ statusBox.innerHTML = msg }
-
-    const STORAGE_KEY = 'wglt_json_v2_progress';
-
     function loadSavedProgress(){
       try{
         const raw = localStorage.getItem(STORAGE_KEY);
@@ -338,14 +316,9 @@
         unlockedBadges = Array.isArray(data.unlockedBadges) ? data.unlockedBadges : [];
       }catch(err){}
     }
-
     function saveProgress(){
       try{
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          totalScoreAcrossLessons,
-          lessonsCompleted,
-          unlockedBadges
-        }));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ totalScoreAcrossLessons, lessonsCompleted, unlockedBadges }));
       }catch(err){}
     }
     function updateProgressStats(){ scoreStat.textContent=String(totalScoreAcrossLessons); badgeCountStat.textContent=String(unlockedBadges.length); lessonCountStat.textContent=String(lessonsCompleted); badgeShelf.innerHTML=''; unlockedBadges.forEach(name=>{const pill=document.createElement('div'); pill.className='badge-pill'; pill.textContent=name; badgeShelf.appendChild(pill)}) }
@@ -360,7 +333,6 @@
       if (Array.isArray(data)) return data;
       throw new Error('Expected { "subjects": [...] } or plain array in subjects index.');
     }
-
     function normalizeSubject(data, fallbackName=''){
       if (data && Array.isArray(data.items)) return data;
       if (Array.isArray(data)) return { subject: fallbackName, items: data };
@@ -410,7 +382,7 @@
             currentSubjectData = { subject: meta.subject, items: [] };
           }
         }catch(err){
-          currentSubjectData = FALLBACK_SUBJECTS[meta.subject] || { subject: meta.subject, items: [] };
+          currentSubjectData = { subject: meta.subject, items: [] };
         }
         subjectCache.set(meta.subject, currentSubjectData);
       }
@@ -439,11 +411,7 @@
       const q = searchInput.value.trim().toLowerCase();
       filteredItems = items.filter(item=>{
         if(!q) return true;
-        const blob = [
-          item.title || '',
-          item.description || '',
-          ...(item.keywords || [])
-        ].join(' ').toLowerCase();
+        const blob = [item.title || '', item.description || '', ...(item.keywords || [])].join(' ').toLowerCase();
         return blob.includes(q);
       });
       selectedItemIndex = filteredItems.length ? Math.min(selectedItemIndex, filteredItems.length - 1) : 0;
@@ -461,8 +429,9 @@
       filteredItems.forEach((item,index)=>{
         const card = document.createElement('div');
         card.className = 'thumb-card' + (index===selectedItemIndex ? ' active' : '');
+        const img = item.thumbnailUrl || item.imageUrl || '';
         card.innerHTML = `
-          <div class="thumb-img">${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}">` : '<div class="tiny-note">No image</div>'}</div>
+          <div class="thumb-img">${img ? `<img src="${img}" alt="${item.title}">` : '<div class="tiny-note">No image</div>'}</div>
           <div class="thumb-body">
             <div class="thumb-title">${item.title || 'Untitled lesson'}</div>
             <div class="thumb-desc">${item.description || ''}</div>
@@ -504,16 +473,17 @@
     function buildPieces(){
       const item = getCurrentItem();
       if (!item) return;
-      pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); piecesLayer.innerHTML=''; edgeCache.clear(); updateBoardMetrics();
+      pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); piecesLayer.innerHTML=''; leftTray.innerHTML=''; rightTray.innerHTML=''; edgeCache.clear(); updateBoardMetrics();
       const total=size*size; totalStat.textContent=String(total);
       for(let row=0;row<size;row++){ for(let col=0;col<size;col++){
         const top=edgeValue(row,col,'top'), right=edgeValue(row,col,'right'), bottom=edgeValue(row,col,'bottom'), left=edgeValue(row,col,'left');
         const {d,tab}=makePiecePath(pieceWidth,pieceHeight,top,right,bottom,left);
-        const piece={id:`${row}-${col}`,row,col,top,right,bottom,left,path:d,tab,width:pieceWidth,height:pieceHeight,x:0,y:0,imageUrl:item.imageUrl,el:null,groupId:null};
+        const piece={id:`${row}-${col}`,row,col,top,right,bottom,left,path:d,tab,width:pieceWidth,height:pieceHeight,x:0,y:0,imageUrl:item.imageUrl,el:null,groupId:null,zone:'board'};
         pieces.push(piece); pieceById.set(piece.id,piece)
       }}
-      scatterSinglesToEdges();
+      scatterSinglesInBoard();
       pieces.forEach(piece=>{ createPieceElement(piece); const group={id:`g-${piece.id}`,pieceIds:[piece.id]}; groups.push(group); groupById.set(group.id,group); piece.groupId=group.id; positionPieceElement(piece) });
+      organizeLoosePiecesToTrays();
       updateStats();
     }
 
@@ -530,37 +500,57 @@
       svg.appendChild(path); svg.appendChild(stroke); wrap.appendChild(svg); piecesLayer.appendChild(wrap); piece.el=wrap; wrap.addEventListener('pointerdown',onPointerDown); wrap.addEventListener('dragstart',e=>e.preventDefault())
     }
 
-    function positionPieceElement(piece){ piece.el.style.left=`${piece.x-piece.tab}px`; piece.el.style.top=`${piece.y-piece.tab}px`; piece.el.classList.toggle('connected',getGroup(piece.groupId).pieceIds.length>1) }
+    function positionPieceElement(piece){
+      piece.el.style.left=`${piece.x-piece.tab}px`;
+      piece.el.style.top=`${piece.y-piece.tab}px`;
+      piece.el.classList.toggle('connected',getGroup(piece.groupId).pieceIds.length>1);
+    }
+
     function getGroup(groupId){ return groupById.get(groupId) }
     function getGroupPieces(groupId){ return getGroup(groupId).pieceIds.map(id=>pieceById.get(id)) }
     function getNeighborDirection(a,b){ if(a.row===b.row&&a.col+1===b.col) return 'right'; if(a.row===b.row&&a.col-1===b.col) return 'left'; if(a.col===b.col&&a.row+1===b.row) return 'down'; if(a.col===b.col&&a.row-1===b.row) return 'up'; return null }
     function expectedOffset(a,b){ const dir=getNeighborDirection(a,b); if(dir==='right') return {dx:pieceWidth,dy:0}; if(dir==='left') return {dx:-pieceWidth,dy:0}; if(dir==='down') return {dx:0,dy:pieceHeight}; if(dir==='up') return {dx:0,dy:-pieceHeight}; return null }
 
     function onPointerDown(e){
-      if(!puzzleStarted) return; const piece=pieceById.get(e.currentTarget.dataset.id); if(!piece) return;
-      activeGroup=getGroup(piece.groupId); dragMembers=getGroupPieces(activeGroup.id); dragStartPositions=dragMembers.map(p=>({id:p.id,x:p.x,y:p.y})); dragPointerStartX=e.clientX; dragPointerStartY=e.clientY;
-      dragMembers.forEach((p,idx)=>{ p.el.classList.add('dragging'); p.el.style.zIndex=String(zCounter+idx) }); zCounter+=dragMembers.length+2;
+      if(!puzzleStarted) return;
+      const piece=pieceById.get(e.currentTarget.dataset.id); if(!piece) return;
+      activeGroup=getGroup(piece.groupId);
+      dragMembers=getGroupPieces(activeGroup.id);
+      dragStartPositions=dragMembers.map(p=>({id:p.id,x:p.x,y:p.y,zone:p.zone}));
+      dragPointerStartX=e.clientX; dragPointerStartY=e.clientY;
+      dragMembers.forEach((p,idx)=>{ p.el.classList.add('dragging'); p.el.style.zIndex=String(zCounter+idx); p.zone='board'; piecesLayer.appendChild(p.el); });
+      zCounter+=dragMembers.length+2;
       e.currentTarget.setPointerCapture(e.pointerId); window.addEventListener('pointermove',onPointerMove); window.addEventListener('pointerup',onPointerUp)
     }
 
     function onPointerMove(e){
-      if(!activeGroup) return; const dx=e.clientX-dragPointerStartX, dy=e.clientY-dragPointerStartY;
-      dragMembers.forEach(p=>{ const start=dragStartPositions.find(s=>s.id===p.id); p.x=start.x+dx; p.y=start.y+dy; positionPieceElement(p) })
+      if(!activeGroup) return;
+      const dx=e.clientX-dragPointerStartX, dy=e.clientY-dragPointerStartY;
+      dragMembers.forEach(p=>{
+        const start=dragStartPositions.find(s=>s.id===p.id);
+        p.x=start.x+dx; p.y=start.y+dy; p.zone='board'; positionPieceElement(p)
+      })
     }
 
     function onPointerUp(){
-      if(!activeGroup) return; dragMembers.forEach(p=>p.el.classList.remove('dragging')); moves++;
-      constrainGroupToBoard(activeGroup.id); let mergedAnything=false, didMerge;
+      if(!activeGroup) return;
+      dragMembers.forEach(p=>p.el.classList.remove('dragging'));
+      moves++;
+      constrainGroupToBoard(activeGroup.id);
+      let mergedAnything=false, didMerge;
       do{ didMerge=tryMergeGroup(activeGroup.id); mergedAnything=mergedAnything||didMerge }while(didMerge&&activeGroup);
       updateStats(); checkCompletion();
       if(mergedAnything){ const count=getGroup(activeGroup.id).pieceIds.length; setStatus(`Nice! Connected pieces now move together. Group size: ${count}.`) }
-      moveSinglesToTopLayer();
+      organizeLoosePiecesToTrays();
       dragMembers=[]; dragStartPositions=[]; activeGroup=null; window.removeEventListener('pointermove',onPointerMove); window.removeEventListener('pointerup',onPointerUp)
     }
 
     function constrainGroupToBoard(groupId){
       const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId); let shiftX=0, shiftY=0;
-      if(bbox.minX<-20) shiftX=-20-bbox.minX; if(bbox.minY<-20) shiftY=-20-bbox.minY; if(bbox.maxX>boardRect.width+20) shiftX=(boardRect.width+20)-bbox.maxX; if(bbox.maxY>boardRect.height+20) shiftY=(boardRect.height+20)-bbox.maxY;
+      if(bbox.minX<0) shiftX=-bbox.minX;
+      if(bbox.minY<0) shiftY=-bbox.minY;
+      if(bbox.maxX>boardRect.width) shiftX=boardRect.width-bbox.maxX;
+      if(bbox.maxY>boardRect.height) shiftY=boardRect.height-bbox.maxY;
       members.forEach(p=>{ p.x+=shiftX; p.y+=shiftY; positionPieceElement(p) })
     }
 
@@ -570,43 +560,99 @@
     }
 
     function tryMergeGroup(groupId){
-      const group=getGroup(groupId); if(!group) return false; const candidates=groups.filter(g=>g.id!==groupId), snapThreshold=Math.min(pieceWidth,pieceHeight)*.22;
+      const group=getGroup(groupId); if(!group) return false;
+      const candidates=groups.filter(g=>g.id!==groupId), snapThreshold=Math.min(pieceWidth,pieceHeight)*.22;
       for(const other of candidates){
         const groupPieces=getGroupPieces(group.id), otherPieces=getGroupPieces(other.id);
         for(const a of groupPieces){ for(const b of otherPieces){
-          const expected=expectedOffset(a,b); if(!expected) continue; const actualDx=b.x-a.x, actualDy=b.y-a.y, errX=expected.dx-actualDx, errY=expected.dy-actualDy, dist=Math.hypot(errX,errY);
-          if(dist<=snapThreshold){ otherPieces.forEach(p=>{ p.x+=errX; p.y+=errY }); mergeGroups(group.id,other.id); return true }
+          const expected=expectedOffset(a,b); if(!expected) continue;
+          const actualDx=b.x-a.x, actualDy=b.y-a.y, errX=expected.dx-actualDx, errY=expected.dy-actualDy, dist=Math.hypot(errX,errY);
+          if(dist<=snapThreshold){ otherPieces.forEach(p=>{ p.x+=errX; p.y+=errY; p.zone='board' }); mergeGroups(group.id,other.id); return true }
         }}
       } return false
     }
 
     function mergeGroups(groupAId,groupBId){
       const groupA=getGroup(groupAId), groupB=getGroup(groupBId); if(!groupA||!groupB) return;
-      groupB.pieceIds.forEach(id=>{ const piece=pieceById.get(id); piece.groupId=groupA.id; groupA.pieceIds.push(id) });
+      groupB.pieceIds.forEach(id=>{ const piece=pieceById.get(id); piece.groupId=groupA.id; piece.zone='board'; groupA.pieceIds.push(id) });
       groups=groups.filter(g=>g.id!==groupB.id); groupById.delete(groupB.id); getGroupPieces(groupA.id).forEach(positionPieceElement); activeGroup=groupA; dragMembers=getGroupPieces(groupA.id);
       const bringForward=dragMembers.slice().sort((a,b)=>(a.row+a.col)-(b.row+b.col)); bringForward.forEach((p,idx)=>{ p.el.style.zIndex=String(zCounter+idx) }); zCounter+=bringForward.length+2
     }
 
     function updateStats(){ movesStat.textContent=String(moves); const largestGroup=groups.length?Math.max(...groups.map(g=>g.pieceIds.length)):0; connectedStat.textContent=String(largestGroup); totalStat.textContent=String(pieces.length) }
-    function moveSinglesToTopLayer(){ const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0])); singles.forEach((piece,idx)=>{ piece.el.style.zIndex=String(zCounter+idx) }); if(singles.length) zCounter+=singles.length+2 }
 
-    function scatterSinglesToEdges(){
-      const pad=10,total=pieces.length,topCount=Math.ceil(total/4),rightCount=Math.ceil((total-topCount)/3),bottomCount=Math.ceil((total-topCount-rightCount)/2),leftCount=total-topCount-rightCount-bottomCount,positions=[];
-      const topSlots=Math.max(1,topCount), rightSlots=Math.max(1,rightCount), bottomSlots=Math.max(1,bottomCount), leftSlots=Math.max(1,leftCount);
-      for(let i=0;i<topCount;i++){ const x=(boardRect.width-pieceWidth)*(topSlots===1?.5:i/(topSlots-1)); positions.push({x,y:pad}) }
-      for(let i=0;i<rightCount;i++){ const y=(boardRect.height-pieceHeight)*(rightSlots===1?.5:i/(rightSlots-1)); positions.push({x:boardRect.width-pieceWidth-pad,y}) }
-      for(let i=0;i<bottomCount;i++){ const x=(boardRect.width-pieceWidth)*(bottomSlots===1?.5:1-i/(bottomSlots-1)); positions.push({x,y:boardRect.height-pieceHeight-pad}) }
-      for(let i=0;i<leftCount;i++){ const y=(boardRect.height-pieceHeight)*(leftSlots===1?.5:1-i/(leftSlots-1)); positions.push({x:pad,y}) }
-      pieces.forEach((piece,idx)=>{ const pos=positions[idx]||{x:Math.random()*Math.max(20,boardRect.width-pieceWidth-20),y:Math.random()*Math.max(20,boardRect.height-pieceHeight-20)}, jitter=6; piece.x=Math.max(-10,Math.min(boardRect.width-pieceWidth+10,pos.x+(Math.random()*jitter-jitter/2))); piece.y=Math.max(-10,Math.min(boardRect.height-pieceHeight+10,pos.y+(Math.random()*jitter-jitter/2))) })
+    function scatterSinglesInBoard(){
+      pieces.forEach(piece=>{
+        piece.x=Math.random()*(boardRect.width-pieceWidth);
+        piece.y=Math.random()*(boardRect.height-pieceHeight);
+        piece.zone='board';
+      });
     }
 
-    function moveSinglesToEdges(){
-      if(!pieces.length) return; const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0])); if(!singles.length){ setStatus('All pieces are already connected into larger groups.'); return }
-      const pad=14, usableW=boardRect.width-pieceWidth-pad*2, usableH=boardRect.height-pieceHeight-pad*2, topSlots=[], rightSlots=[], bottomSlots=[], leftSlots=[], countPerSide=Math.ceil(singles.length/4);
-      for(let i=0;i<countPerSide;i++){ const t=countPerSide===1?.5:i/(countPerSide-1); topSlots.push({x:pad+usableW*t,y:pad}); rightSlots.push({x:pad+usableW,y:pad+usableH*t}); bottomSlots.push({x:pad+usableW*(1-t),y:pad+usableH}); leftSlots.push({x:pad,y:pad+usableH*(1-t)}) }
-      const slots=[...topSlots,...rightSlots,...bottomSlots,...leftSlots];
-      singles.forEach((piece,idx)=>{ const slot=slots[idx%slots.length], jitter=4; piece.x=slot.x+(Math.random()*jitter-jitter/2); piece.y=slot.y+(Math.random()*jitter-jitter/2); piece.el.style.zIndex=String(zCounter+idx); positionPieceElement(piece) });
-      zCounter+=singles.length+2; setStatus('Loose pieces were spread around the outer ring and brought to the top.')
+    function organizeLoosePiecesToTrays(){
+      leftTray.innerHTML=''; rightTray.innerHTML='';
+      const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0]));
+      const mobile = window.matchMedia('(max-width: 1300px)').matches;
+      const trayA = leftTray.getBoundingClientRect();
+      const trayB = rightTray.getBoundingClientRect();
+
+      singles.forEach((piece,idx)=>{
+        const targetTray = idx % 2 === 0 ? leftTray : rightTray;
+        targetTray.appendChild(piece.el);
+        piece.zone='tray';
+        piece.el.classList.add('tray-piece');
+
+        if(mobile){
+          const cols = Math.max(2, Math.floor(targetTray.clientWidth / Math.max(50, pieceWidth * 0.38)));
+          const scale = Math.min(0.42, (targetTray.clientWidth - 12) / (pieceWidth * Math.max(1, cols)));
+          const w = pieceWidth * scale;
+          const h = pieceHeight * scale;
+          const col = Math.floor((idx/2) % cols);
+          const row = Math.floor((idx/2) / cols);
+          piece.el.style.transformOrigin='top left';
+          piece.el.style.transform=`scale(${scale})`;
+          piece.el.style.left=`${8 + col * (w + 6)}px`;
+          piece.el.style.top=`${8 + row * (h + 6)}px`;
+        }else{
+          const trayWidth = targetTray.clientWidth || 150;
+          const scale = Math.min(0.5, (trayWidth - 20) / pieceWidth);
+          const w = pieceWidth * scale;
+          const h = pieceHeight * scale;
+          const row = Math.floor(idx/2);
+          piece.el.style.transformOrigin='top left';
+          piece.el.style.transform=`scale(${scale})`;
+          piece.el.style.left=`${Math.max(6, (trayWidth - w) / 2)}px`;
+          piece.el.style.top=`${8 + row * (h + 8)}px`;
+        }
+      });
+
+      groups.filter(g=>g.pieceIds.length>1).forEach(g=>{
+        getGroupPieces(g.id).forEach(p=>{
+          if(p.zone!=='board'){
+            p.zone='board';
+            p.el.style.transform='scale(1)';
+            p.el.style.transformOrigin='top left';
+            piecesLayer.appendChild(p.el);
+            positionPieceElement(p);
+          } else {
+            p.el.style.transform='scale(1)';
+            piecesLayer.appendChild(p.el);
+            positionPieceElement(p);
+          }
+        });
+      });
+
+      singles.forEach(piece=>{
+        piece.el.style.zIndex=String(zCounter++);
+      });
+    }
+
+    function sendLoosePiecesToTrays(){
+      if(!pieces.length) return;
+      const singles=groups.filter(g=>g.pieceIds.length===1);
+      if(!singles.length){ setStatus('All pieces are already connected into larger groups.'); return; }
+      organizeLoosePiecesToTrays();
+      setStatus('Loose single pieces were organized into the left and right trays.');
     }
 
     function startInlineTransition(){
@@ -639,9 +685,8 @@
     }
 
     function finishQuiz(){
-      const quizLength=currentQuizOrder.length||0, pct=quizLength?Math.round((quizScore/quizLength)*100):0; totalScoreAcrossLessons+=quizScore; lessonsCompleted+=1;
+      const quizLength=currentQuizOrder.length||0, pct=quizLength?Math.round((quizScore/quizLength)*100):0; totalScoreAcrossLessons+=quizScore; lessonsCompleted+=1; saveProgress();
       const item=getCurrentItem(), badgeName=pct===100?`${item.title} Mastery Badge`:pct>=70?`${item.title} Scholar Badge`:`${item.title} Explorer Badge`;
-      saveProgress();
       awardBadge(badgeName); resultsBox.classList.add('show'); resultsBox.innerHTML=`<strong>Quiz Complete</strong><br><br>You scored <strong>${quizScore} / ${quizLength}</strong> (${pct}%).<br><br><strong>Badge unlocked:</strong> ${badgeName}<br><br>Next lesson in this subject will load automatically.`;
       nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; updateProgressStats(); setStatus('Quiz complete. Preparing the next lesson...');
       showCelebration('Badge Unlocked 🎉',`You earned <strong>${badgeName}</strong>.<br>Total score so far: <strong>${totalScoreAcrossLessons}</strong><br><br>Loading the next lesson...`,2800,goToNextLesson)
@@ -654,13 +699,13 @@
       showCelebration('Subject Complete 🌟',`You completed <strong>${subject.subject}</strong>.<br>Badges earned: <strong>${unlockedBadges.length}</strong>`,2600,()=>{ resetLesson(); hintVisible=false; renderPreview() })
     }
 
-    function resetBoardOnly(){ piecesLayer.innerHTML=''; boardGrid.innerHTML=''; pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); moves=0; puzzleStarted=false; activeGroup=null; dragMembers=[]; dragStartPositions=[]; updateStats() }
+    function resetBoardOnly(){ piecesLayer.innerHTML=''; boardGrid.innerHTML=''; leftTray.innerHTML=''; rightTray.innerHTML=''; pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); moves=0; puzzleStarted=false; activeGroup=null; dragMembers=[]; dragStartPositions=[]; updateStats() }
     function resetLesson(){ if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); celebrationOverlay.classList.remove('show'); resetBoardOnly(); inlineVideo.pause(); inlineVideo.removeAttribute('src'); inlineVideo.load(); inlineVideo.style.opacity='0'; piecesLayer.style.opacity='1'; piecesLayer.style.transform='scale(1)'; quizShell.classList.remove('show'); resultsBox.classList.remove('show'); resultsBox.innerHTML=''; nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; quizIndex=0; quizScore=0; quizAnswered=false; currentQuizOrder=[]; updateProgressStats() }
     function autoStartCurrentLesson(){ size=Number(difficulty.value); resetLesson(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Next lesson loaded automatically. Drag pieces into place to begin.') }
     function startLessonFlow(){ if(!getCurrentItem()){ setStatus('Please choose a lesson first.'); return } size=Number(difficulty.value); resetLesson(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Drag pieces into place. Matching neighbors snap together and move as one group.') }
 
     startBtn.addEventListener('click',startLessonFlow);
-    edgeBtn.addEventListener('click',moveSinglesToEdges);
+    trayBtn.addEventListener('click',sendLoosePiecesToTrays);
     showSolvedBtn.addEventListener('click',()=>{ hintVisible=true; renderPreview(); setStatus('Hint picture shown.') });
     resetBtn.addEventListener('click',()=>{ resetLesson(); hintVisible=false; renderPreview(); setStatus('Lesson reset. Choose a size and start again.') });
     nextQuestionBtn.addEventListener('click',()=>{ quizIndex++; renderQuizQuestion() });
@@ -668,9 +713,9 @@
     inlineVideo.addEventListener('ended',showQuiz);
     reloadIndexBtn.addEventListener('click',()=>loadIndex(indexPathInput.value.trim()||'data/subjects-index.json'));
     searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
-    window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; resetLesson(); hintVisible=false; renderPreview(); setStatus('Board resized. Start the lesson again to keep the layout clean.') });
+    window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; if(groups.filter(g=>g.pieceIds.length===1).length){ organizeLoosePiecesToTrays(); } });
 
-    loadSavedProgress(); renderSubjects(); updateProgressStats(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
+    loadSavedProgress(); updateProgressStats(); renderSubjects(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
   </script>
 </body>
 </html>

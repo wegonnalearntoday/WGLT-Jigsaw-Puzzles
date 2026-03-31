@@ -1,142 +1,145 @@
-[
-  {
-    "title": "James Baldwin",
-    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
-    "description": "Writer and social critic whose work explored race, identity, and justice.",
-    "keywords": [
-      "writer",
-      "author",
-      "essayist",
-      "civil rights"
-    ],
-    "quiz": [
-      {
-        "q": "James Baldwin was best known as what?",
-        "choices": [
-          "A writer and social critic",
-          "A chemist",
-          "A boxer",
-          "A pilot"
-        ],
-        "answer": 0,
-        "explanation": "Baldwin was a writer, essayist, novelist, and social critic."
-      },
-      {
-        "q": "A common theme in Baldwin's work was what?",
-        "choices": [
-          "Race and identity",
-          "Volcanoes",
-          "Baseball stats",
-          "Ocean mapping"
-        ],
-        "answer": 0,
-        "explanation": "He often wrote about race, identity, justice, and American life."
-      },
-      {
-        "q": "Baldwin's essays are remembered for being what?",
-        "choices": [
-          "Powerful and honest",
-          "Silent and technical",
-          "Only humorous",
-          "Mostly about cars"
-        ],
-        "answer": 0,
-        "explanation": "His essays are known for honesty and force."
-      },
-      {
-        "q": "Why is Baldwin studied in Black history?",
-        "choices": [
-          "He shaped conversations about equality",
-          "He invented a telescope",
-          "He coached football",
-          "He built bridges"
-        ],
-        "answer": 0,
-        "explanation": "His work influenced major conversations on equality and race."
-      },
-      {
-        "q": "Which form did Baldwin write often?",
-        "choices": [
-          "Essays and novels",
-          "Blueprints",
-          "Recipe books",
-          "Lab manuals"
-        ],
-        "answer": 0,
-        "explanation": "He is especially known for essays and novels."
-      }
-    ]
-  },
-  {
-    "title": "Faith Ringgold",
-    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
-    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
-    "description": "Artist and storyteller celebrated for her story quilts and visual narratives.",
-    "keywords": [
-      "artist",
-      "story quilts",
-      "visual art",
-      "culture"
-    ],
-    "quiz": [
-      {
-        "q": "Faith Ringgold is widely known as what?",
-        "choices": [
-          "An artist and storyteller",
-          "A race car driver",
-          "A geologist",
-          "A swimmer"
-        ],
-        "answer": 0,
-        "explanation": "Ringgold is celebrated as an artist, writer, and storyteller."
-      },
-      {
-        "q": "Ringgold became especially famous for creating what?",
-        "choices": [
-          "Story quilts",
-          "Stone pyramids",
-          "Film reels",
-          "Satellites"
-        ],
-        "answer": 0,
-        "explanation": "Her story quilts combine visual art and storytelling."
-      },
-      {
-        "q": "Her artwork often tells stories about what?",
-        "choices": [
-          "Black life and history",
-          "Only weather",
-          "Video game cheats",
-          "Farm equipment"
-        ],
-        "answer": 0,
-        "explanation": "Her work often tells stories about Black life, family, and culture."
-      },
-      {
-        "q": "Ringgold's work blends art with what else?",
-        "choices": [
-          "History and identity",
-          "Only sports",
-          "Fishing maps",
-          "Computer repair"
-        ],
-        "answer": 0,
-        "explanation": "Her art blends creativity with history and identity."
-      },
-      {
-        "q": "Why is Ringgold important in cultural lessons?",
-        "choices": [
-          "Her art preserves stories and perspectives",
-          "She invented radar",
-          "She discovered a planet",
-          "She built race cars"
-        ],
-        "answer": 0,
-        "explanation": "Her work preserves cultural memory."
-      }
-    ]
-  }
-]
+{
+  "subject": "Black Historical Figures & Leaders",
+  "items": [
+    {
+      "title": "James Baldwin",
+      "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+      "description": "Writer and social critic whose work explored race, identity, and justice.",
+      "keywords": [
+        "writer",
+        "author",
+        "essayist",
+        "civil rights"
+      ],
+      "quiz": [
+        {
+          "q": "James Baldwin was best known as what?",
+          "choices": [
+            "A writer and social critic",
+            "A chemist",
+            "A boxer",
+            "A pilot"
+          ],
+          "answer": 0,
+          "explanation": "Baldwin was a writer, essayist, novelist, and social critic."
+        },
+        {
+          "q": "A common theme in Baldwin's work was what?",
+          "choices": [
+            "Race and identity",
+            "Volcanoes",
+            "Baseball stats",
+            "Ocean mapping"
+          ],
+          "answer": 0,
+          "explanation": "He often wrote about race, identity, justice, and American life."
+        },
+        {
+          "q": "Baldwin's essays are remembered for being what?",
+          "choices": [
+            "Powerful and honest",
+            "Silent and technical",
+            "Only humorous",
+            "Mostly about cars"
+          ],
+          "answer": 0,
+          "explanation": "His essays are known for honesty and force."
+        },
+        {
+          "q": "Why is Baldwin studied in Black history?",
+          "choices": [
+            "He shaped conversations about equality",
+            "He invented a telescope",
+            "He coached football",
+            "He built bridges"
+          ],
+          "answer": 0,
+          "explanation": "His work influenced major conversations on equality and race."
+        },
+        {
+          "q": "Which form did Baldwin write often?",
+          "choices": [
+            "Essays and novels",
+            "Blueprints",
+            "Recipe books",
+            "Lab manuals"
+          ],
+          "answer": 0,
+          "explanation": "He is especially known for essays and novels."
+        }
+      ]
+    },
+    {
+      "title": "Faith Ringgold",
+      "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+      "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+      "description": "Artist and storyteller celebrated for her story quilts and visual narratives.",
+      "keywords": [
+        "artist",
+        "story quilts",
+        "visual art",
+        "culture"
+      ],
+      "quiz": [
+        {
+          "q": "Faith Ringgold is widely known as what?",
+          "choices": [
+            "An artist and storyteller",
+            "A race car driver",
+            "A geologist",
+            "A swimmer"
+          ],
+          "answer": 0,
+          "explanation": "Ringgold is celebrated as an artist, writer, and storyteller."
+        },
+        {
+          "q": "Ringgold became especially famous for creating what?",
+          "choices": [
+            "Story quilts",
+            "Stone pyramids",
+            "Film reels",
+            "Satellites"
+          ],
+          "answer": 0,
+          "explanation": "Her story quilts combine visual art and storytelling."
+        },
+        {
+          "q": "Her artwork often tells stories about what?",
+          "choices": [
+            "Black life and history",
+            "Only weather",
+            "Video game cheats",
+            "Farm equipment"
+          ],
+          "answer": 0,
+          "explanation": "Her work often tells stories about Black life, family, and culture."
+        },
+        {
+          "q": "Ringgold's work blends art with what else?",
+          "choices": [
+            "History and identity",
+            "Only sports",
+            "Fishing maps",
+            "Computer repair"
+          ],
+          "answer": 0,
+          "explanation": "Her art blends creativity with history and identity."
+        },
+        {
+          "q": "Why is Ringgold important in cultural lessons?",
+          "choices": [
+            "Her art preserves stories and perspectives",
+            "She invented radar",
+            "She discovered a planet",
+            "She built race cars"
+          ],
+          "answer": 0,
+          "explanation": "Her work preserves cultural memory."
+        }
+      ]
+    }
+  ]
+}

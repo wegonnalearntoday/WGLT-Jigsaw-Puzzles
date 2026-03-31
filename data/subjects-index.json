@@ -7,27 +7,33 @@
     },
     {
       "subject": "Movies",
-      "file": "data/subject-movies.json"
+      "file": "data/subject-movies.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
     },
     {
       "subject": "Art by Black Artists",
-      "file": "data/subject-art-by-black-artists.json"
+      "file": "data/subject-art-by-black-artists.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
     },
     {
       "subject": "Civil Rights & Milestone Moments",
-      "file": "data/subject-civil-rights-and-milestone-moments.json"
+      "file": "data/subject-civil-rights-and-milestone-moments.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
     },
     {
       "subject": "Sport Icons",
-      "file": "data/subject-sport-icons.json"
+      "file": "data/subject-sport-icons.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
     },
     {
       "subject": "Cultural & Musical Heritage",
-      "file": "data/subject-cultural-and-musical-heritage.json"
+      "file": "data/subject-cultural-and-musical-heritage.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
     },
     {
       "subject": "Crafts and Artistry",
-      "file": "data/subject-crafts-and-artistry.json"
+      "file": "data/subject-crafts-and-artistry.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
     }
   ]
 }
