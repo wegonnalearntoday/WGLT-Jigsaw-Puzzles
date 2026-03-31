@@ -1,0 +1,33 @@
+{
+  "subjects": [
+    {
+      "subject": "Black Historical Figures & Leaders",
+      "file": "data/subject-black-historical-figures.json",
+      "thumbnail": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png"
+    },
+    {
+      "subject": "Movies",
+      "file": "data/subject-movies.json"
+    },
+    {
+      "subject": "Art by Black Artists",
+      "file": "data/subject-art-by-black-artists.json"
+    },
+    {
+      "subject": "Civil Rights & Milestone Moments",
+      "file": "data/subject-civil-rights-and-milestone-moments.json"
+    },
+    {
+      "subject": "Sport Icons",
+      "file": "data/subject-sport-icons.json"
+    },
+    {
+      "subject": "Cultural & Musical Heritage",
+      "file": "data/subject-cultural-and-musical-heritage.json"
+    },
+    {
+      "subject": "Crafts and Artistry",
+      "file": "data/subject-crafts-and-artistry.json"
+    }
+  ]
+}

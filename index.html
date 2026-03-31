@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WGLT JSON Lesson Flow V2</title>
+  <style>
+    :root{
+      --bg:#101418;--panel:#182028;--card:#202a34;--text:#f3f6f9;--muted:#aab7c4;
+      --accent:#f4b400;--accent2:#2bb673;--danger:#e24a4a;--shadow:0 12px 28px rgba(0,0,0,.35);
+      --boardSize:920px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#0d1116,#141b22 45%,#101418);color:var(--text);min-height:100vh}
+    .wrap{max-width:1400px;margin:0 auto;padding:18px}
+    .hero,.panel,.stage{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:24px;box-shadow:var(--shadow)}
+    .hero{padding:20px;margin-bottom:18px}
+    h1{margin:0 0 8px;font-size:clamp(28px,4vw,42px)}
+    .sub{color:var(--muted);line-height:1.5;margin:0}
+    .layout{display:grid;grid-template-columns:430px 1fr;gap:18px}
+    .panel,.stage{padding:18px}
+    .field{margin-bottom:14px}
+    label{display:block;margin-bottom:8px;font-weight:700}
+    select,button,input{
+      width:100%;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:var(--card);
+      color:var(--text);padding:12px 14px;font-size:15px
+    }
+    button{cursor:pointer;font-weight:700;transition:transform .15s ease,opacity .15s ease}
+    button:hover{transform:translateY(-1px)}
+    button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .btn-primary{background:linear-gradient(135deg,var(--accent),#ffcf40);color:#181818;border:none}
+    .btn-secondary{background:linear-gradient(135deg,var(--accent2),#46d88f);color:#072114;border:none}
+    .btn-danger{background:linear-gradient(135deg,var(--danger),#ff6767);color:#fff;border:none}
+    .actions{display:grid;gap:10px;margin-top:10px}
+    .search-row,.json-row{display:grid;grid-template-columns:1fr auto;gap:10px}
+    .subject-list{display:grid;gap:8px;max-height:210px;overflow:auto;padding-right:4px}
+    .pill-btn{text-align:left;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);padding:12px 14px;border-radius:14px}
+    .pill-btn.active{box-shadow:0 0 0 2px rgba(244,180,0,.75) inset;background:rgba(244,180,0,.12)}
+    .thumb-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-height:430px;overflow:auto;padding-right:4px}
+    .thumb-card{
+      background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;
+      overflow:hidden;cursor:pointer;transition:transform .15s ease, box-shadow .15s ease
+    }
+    .thumb-card:hover{transform:translateY(-2px)}
+    .thumb-card.active{box-shadow:0 0 0 2px rgba(244,180,0,.8) inset;background:rgba(244,180,0,.10)}
+    .thumb-img{aspect-ratio:1/1;background:#0b0f14;display:flex;align-items:center;justify-content:center}
+    .thumb-img img{width:100%;height:100%;object-fit:cover;display:block}
+    .thumb-body{padding:10px 12px}
+    .thumb-title{font-weight:700;margin-bottom:6px}
+    .thumb-desc{font-size:12px;color:var(--muted);line-height:1.4}
+    .status{margin-top:12px;padding:12px 14px;background:rgba(255,255,255,.04);border-radius:14px;color:var(--muted);min-height:56px}
+    .preview{margin-top:14px;border-radius:18px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:#0b0f14;min-height:160px;display:flex;align-items:center;justify-content:center}
+    .preview img{display:block;width:100%;height:auto}
+    .preview-placeholder{padding:20px;text-align:center;color:var(--muted);line-height:1.6}
+    .mini-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+    .stat{background:rgba(255,255,255,.04);border-radius:14px;padding:12px;text-align:center}
+    .stat .big{font-size:22px;font-weight:800;margin-top:4px}
+    .badge-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .badge-pill{padding:10px 14px;border-radius:999px;background:rgba(244,180,0,.14);border:1px solid rgba(244,180,0,.35);font-weight:700}
+    .tiny-note,.hint{color:var(--muted);font-size:14px;line-height:1.5}
+    .stage-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+    .stage-label{color:var(--muted);font-size:14px}
+    .board-shell{position:relative;width:min(100%,var(--boardSize));aspect-ratio:1/1;margin:0 auto;background:radial-gradient(circle at center,rgba(255,255,255,.075),rgba(255,255,255,.03));border-radius:24px;border:2px solid rgba(255,255,255,.08);overflow:hidden}
+    .board-grid{position:absolute;inset:0;display:grid;pointer-events:none;z-index:1}
+    .grid-cell{border:1px dashed rgba(255,255,255,.12)}
+    .board-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease;z-index:2;background:#000}
+    .pieces-layer{position:absolute;inset:0;z-index:4;overflow:visible;transition:opacity .8s ease,transform .8s ease}
+    .piece{position:absolute;user-select:none;touch-action:none;cursor:grab;filter:drop-shadow(0 10px 14px rgba(0,0,0,.38));transition:transform .08s ease;will-change:left,top,transform}
+    .piece.dragging{cursor:grabbing;z-index:999 !important;filter:drop-shadow(0 18px 24px rgba(0,0,0,.5))}
+    .piece svg{display:block;overflow:visible}
+    .piece path.stroke{fill:none;stroke:rgba(255,255,255,.30);stroke-width:2;pointer-events:none}
+    .piece.connected path.stroke{stroke:rgba(43,182,115,.85)}
+    .celebration-overlay{position:absolute;inset:0;display:none !important;align-items:center;justify-content:center;background:rgba(8,12,16,.86);z-index:50 !important;padding:18px;text-align:center}
+    .celebration-overlay.show{display:flex !important}
+    .celebration-card{width:min(92%,560px);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:22px;box-shadow:var(--shadow)}
+    .quiz-shell{width:min(100%,860px);margin:18px auto 0;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:24px;padding:18px;display:none}
+    .quiz-shell.show{display:block}
+    .quiz-header{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+    .q-card{margin-top:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px}
+    .choices{display:grid;gap:10px;margin-top:12px}
+    .choice-btn{text-align:left}
+    .choice-btn.correct{box-shadow:0 0 0 2px rgba(43,182,115,.85) inset}
+    .choice-btn.wrong{box-shadow:0 0 0 2px rgba(226,74,74,.85) inset}
+    .quiz-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+    .results{margin-top:14px;padding:14px;border-radius:16px;background:rgba(255,255,255,.04);display:none}
+    .results.show{display:block}
+    .tiny-code{margin-top:14px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);color:#dfe8ef;font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+    .loader{margin-top:12px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.04);display:none}
+    .loader.show{display:block}
+    @keyframes pulseGlow{0%{box-shadow:0 0 0 rgba(255,255,255,0)}50%{box-shadow:0 0 32px rgba(255,255,255,.35)}100%{box-shadow:0 0 0 rgba(255,255,255,0)}}
+    .flash{animation:pulseGlow .55s ease}
+    @media (max-width:1100px){.layout{grid-template-columns:1fr}.board-shell{width:min(100%,94vw)}.thumb-grid{grid-template-columns:repeat(2,1fr)}}
+    @media (max-width:680px){.thumb-grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>WGLT JSON Lesson Flow V2</h1>
+      <p class="sub">Subject JSON splitting, search bar, and thumbnail cards. Built to grow without becoming a code casserole. 🎯</p>
+    </section>
+
+    <div class="layout">
+      <aside class="panel">
+        <h2>Choose Your Lesson</h2>
+
+        <div class="field">
+          <label for="indexPathInput">Subject index JSON path</label>
+          <div class="json-row">
+            <input id="indexPathInput" value="data/subjects-index.json" />
+            <button id="reloadIndexBtn" class="btn-secondary" style="width:auto;">Load</button>
+          </div>
+          <div class="tiny-note">This loads a small subject index, then each subject file loads only when needed.</div>
+        </div>
+
+        <div id="loaderBox" class="loader">Loading lesson library…</div>
+
+        <div class="field">
+          <label>Subject</label>
+          <div id="subjectList" class="subject-list"></div>
+        </div>
+
+        <div class="field">
+          <label for="searchInput">Search lessons</label>
+          <input id="searchInput" placeholder="Search titles, keywords, or descriptions" />
+        </div>
+
+        <div class="field">
+          <label>Lesson cards</label>
+          <div id="lessonCards" class="thumb-grid"></div>
+        </div>
+
+        <div class="field">
+          <label for="difficulty">Puzzle Size</label>
+          <select id="difficulty">
+            <option value="2">Very Easy • 2 x 2</option>
+            <option value="3">Easy • 3 x 3</option>
+            <option value="4" selected>Medium • 4 x 4</option>
+            <option value="5">Hard • 5 x 5</option>
+            <option value="6">Expert • 6 x 6</option>
+            <option value="7">Master • 7 x 7</option>
+          </select>
+        </div>
+
+        <div class="actions">
+          <button class="btn-primary" id="startBtn">Start Lesson Flow</button>
+          <button class="btn-secondary" id="edgeBtn">Move Loose Pieces to Edges</button>
+          <button class="btn-secondary" id="showSolvedBtn">Show Hint Picture</button>
+          <button class="btn-danger" id="resetBtn">Reset Lesson</button>
+        </div>
+
+        <div class="mini-stats">
+          <div class="stat"><div>Moves</div><div class="big" id="movesStat">0</div></div>
+          <div class="stat"><div>Connected</div><div class="big" id="connectedStat">0</div></div>
+          <div class="stat"><div>Total</div><div class="big" id="totalStat">0</div></div>
+        </div>
+
+        <div class="mini-stats">
+          <div class="stat"><div>Score</div><div class="big" id="scoreStat">0</div></div>
+          <div class="stat"><div>Badges</div><div class="big" id="badgeCountStat">0</div></div>
+          <div class="stat"><div>Lessons</div><div class="big" id="lessonCountStat">0</div></div>
+        </div>
+
+        <div id="badgeShelf" class="badge-row"></div>
+
+        <div class="status" id="statusBox">Load the subject index, choose a subject and lesson card, then press <strong>Start Lesson Flow</strong>.</div>
+
+        <div class="preview" id="previewBox"></div>
+
+        <div class="tiny-code">
+          <strong>Folder structure:</strong><br>
+          <code>index.html</code><br>
+          <code>data/subjects-index.json</code><br>
+          <code>data/subject-black-historical-figures.json</code><br>
+          <code>data/subject-movies.json</code><br>
+          etc.
+        </div>
+      </aside>
+
+      <section class="stage">
+        <div class="stage-top">
+          <div>
+            <h2 id="currentTitle">Lesson Board</h2>
+            <div class="stage-label" id="currentMeta">Load a subject index to begin.</div>
+          </div>
+        </div>
+
+        <div class="board-shell" id="boardShell">
+          <div id="boardGrid" class="board-grid"></div>
+          <video id="inlineVideo" class="board-video" playsinline controls></video>
+          <div id="piecesLayer" class="pieces-layer"></div>
+          <div id="celebrationOverlay" class="celebration-overlay">
+            <div class="celebration-card">
+              <h3 id="celebrationTitle" style="margin:0 0 8px;">Badge Unlocked</h3>
+              <div id="celebrationText" class="tiny-note">Great job.</div>
+            </div>
+          </div>
+        </div>
+
+        <p class="hint">Hint stays hidden until the button is pressed. Finish the puzzle, the board turns into the video, then the quiz appears below.</p>
+
+        <div id="quizShell" class="quiz-shell">
+          <div class="quiz-header">
+            <div>
+              <h3 style="margin:0;">Lesson Quiz</h3>
+              <div class="tiny-note" id="quizMeta">Answer the questions to continue.</div>
+            </div>
+            <div class="tiny-note" id="quizProgress">Question 1 of 5</div>
+          </div>
+
+          <div class="q-card">
+            <div id="questionText" style="font-size:18px;font-weight:700;"></div>
+            <div id="choicesWrap" class="choices"></div>
+            <div id="explainText" class="tiny-note" style="margin-top:12px;"></div>
+          </div>
+
+          <div class="quiz-footer">
+            <button id="nextQuestionBtn" class="btn-secondary" style="width:auto;display:none;">Next Question</button>
+            <button id="finishQuizBtn" class="btn-primary" style="width:auto;display:none;">Finish Quiz</button>
+          </div>
+
+          <div id="resultsBox" class="results"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const FALLBACK_INDEX = {
+      subjects: [
+        { subject: "Black Historical Figures & Leaders", file: "data/subject-black-historical-figures.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Movies", file: "data/subject-movies.json" },
+        { subject: "Art by Black Artists", file: "data/subject-art-by-black-artists.json" },
+        { subject: "Civil Rights & Milestone Moments", file: "data/subject-civil-rights-and-milestone-moments.json" },
+        { subject: "Sport Icons", file: "data/subject-sport-icons.json" },
+        { subject: "Cultural & Musical Heritage", file: "data/subject-cultural-and-musical-heritage.json" },
+        { subject: "Crafts and Artistry", file: "data/subject-crafts-and-artistry.json" }
+      ]
+    };
+
+    const FALLBACK_SUBJECTS = {
+      "Black Historical Figures & Leaders": {
+        subject: "Black Historical Figures & Leaders",
+        items: [
+          {
+            title: "James Baldwin",
+            imageUrl: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+            videoUrl: "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+            description: "Complete the James Baldwin puzzle, watch the lesson clip, then answer five facts-based questions.",
+            keywords: ["writer","civil rights","author","essayist"],
+            quiz: [
+              {q:"James Baldwin was best known as which of the following?",choices:["A writer and social critic","A chemist","A baseball manager","A sculptor"],answer:0,explanation:"James Baldwin was a writer, essayist, novelist, and social critic."},
+              {q:"Which major theme appeared often in Baldwin’s work?",choices:["Race and identity","Rocket engineering only","Weather forecasting","Animal training"],answer:0,explanation:"Baldwin often wrote about race, identity, justice, and American life."},
+              {q:"James Baldwin’s work challenged what?",choices:["Social inequality and injustice","Math homework rules","Ocean maps","Cooking methods"],answer:0,explanation:"His work challenged injustice and pushed readers to confront hard truths."},
+              {q:"Baldwin’s writing is remembered because it was often described as what?",choices:["Powerful and honest","Silent and hidden","Only about sports","Entirely fictional science notes"],answer:0,explanation:"His voice was recognized as powerful, sharp, and deeply honest."},
+              {q:"Why is James Baldwin important in Black history studies?",choices:["He helped shape conversations about race and equality","He invented a video game console","He discovered a new planet","He coached a championship team"],answer:0,explanation:"Baldwin helped shape conversations about race, identity, and equality."}
+            ]
+          },
+          {
+            title: "Faith Ringgold",
+            imageUrl: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+            videoUrl: "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+            description: "Complete the Faith Ringgold puzzle, watch the lesson clip, then answer five facts-based questions.",
+            keywords: ["artist","story quilts","author","visual art"],
+            quiz: [
+              {q:"Faith Ringgold is widely known as which of the following?",choices:["An artist and storyteller","A race car driver","A weather scientist","A pro wrestler"],answer:0,explanation:"Faith Ringgold is celebrated as an artist, writer, and storyteller."},
+              {q:"Ringgold became especially famous for creating what kind of artworks?",choices:["Story quilts","Stone pyramids","Animated films only","Laboratory charts"],answer:0,explanation:"Her story quilts combine visual art and storytelling."},
+              {q:"A major purpose of Ringgold’s art was to do what?",choices:["Tell stories about Black life and history","Teach car repair","Map the moon","Train wild animals"],answer:0,explanation:"Her work often tells stories about Black life, history, family, and culture."},
+              {q:"Faith Ringgold’s work is important because it blends art with what else?",choices:["History and identity","Only sports statistics","Fishing manuals","Computer hardware repair"],answer:0,explanation:"Her art often blends creativity with history, identity, and social themes."},
+              {q:"Why is Faith Ringgold often included in Black history and culture lessons?",choices:["Her art helps preserve stories and perspectives","She invented a submarine","She discovered a mountain range","She created a football league"],answer:0,explanation:"Her work preserves stories, perspectives, and cultural memory."}
+            ]
+          }
+        ]
+      }
+    };
+
+    let SUBJECT_INDEX = FALLBACK_INDEX.subjects;
+    const subjectCache = new Map();
+
+    const indexPathInput = document.getElementById('indexPathInput');
+    const reloadIndexBtn = document.getElementById('reloadIndexBtn');
+    const loaderBox = document.getElementById('loaderBox');
+    const searchInput = document.getElementById('searchInput');
+    const subjectList = document.getElementById('subjectList');
+    const lessonCards = document.getElementById('lessonCards');
+    const difficulty = document.getElementById('difficulty');
+    const startBtn = document.getElementById('startBtn');
+    const edgeBtn = document.getElementById('edgeBtn');
+    const showSolvedBtn = document.getElementById('showSolvedBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const previewBox = document.getElementById('previewBox');
+    const statusBox = document.getElementById('statusBox');
+    const currentTitle = document.getElementById('currentTitle');
+    const currentMeta = document.getElementById('currentMeta');
+    const boardShell = document.getElementById('boardShell');
+    const boardGrid = document.getElementById('boardGrid');
+    const piecesLayer = document.getElementById('piecesLayer');
+    const inlineVideo = document.getElementById('inlineVideo');
+    const movesStat = document.getElementById('movesStat');
+    const connectedStat = document.getElementById('connectedStat');
+    const totalStat = document.getElementById('totalStat');
+    const scoreStat = document.getElementById('scoreStat');
+    const badgeCountStat = document.getElementById('badgeCountStat');
+    const lessonCountStat = document.getElementById('lessonCountStat');
+    const badgeShelf = document.getElementById('badgeShelf');
+    const celebrationOverlay = document.getElementById('celebrationOverlay');
+    const celebrationTitle = document.getElementById('celebrationTitle');
+    const celebrationText = document.getElementById('celebrationText');
+    const quizShell = document.getElementById('quizShell');
+    const quizMeta = document.getElementById('quizMeta');
+    const quizProgress = document.getElementById('quizProgress');
+    const questionText = document.getElementById('questionText');
+    const choicesWrap = document.getElementById('choicesWrap');
+    const explainText = document.getElementById('explainText');
+    const nextQuestionBtn = document.getElementById('nextQuestionBtn');
+    const finishQuizBtn = document.getElementById('finishQuizBtn');
+    const resultsBox = document.getElementById('resultsBox');
+
+    let selectedSubjectIndex = 0, selectedItemIndex = 0, size = 4;
+    let currentSubjectData = null;
+    let filteredItems = [];
+    let boardRect = null, pieceWidth = 0, pieceHeight = 0, edgeCache = new Map();
+    let pieces = [], groups = [], pieceById = new Map(), groupById = new Map();
+    let moves = 0, zCounter = 1000, activeGroup = null, dragMembers = [], dragStartPositions = [], dragPointerStartX = 0, dragPointerStartY = 0, puzzleStarted = false, hintVisible = false;
+    let quizIndex = 0, quizScore = 0, quizAnswered = false, currentQuizOrder = [], totalScoreAcrossLessons = 0, lessonsCompleted = 0, unlockedBadges = [], autoAdvanceTimer = null;
+
+    function setStatus(msg){ statusBox.innerHTML = msg }
+    function updateProgressStats(){ scoreStat.textContent=String(totalScoreAcrossLessons); badgeCountStat.textContent=String(unlockedBadges.length); lessonCountStat.textContent=String(lessonsCompleted); badgeShelf.innerHTML=''; unlockedBadges.forEach(name=>{const pill=document.createElement('div'); pill.className='badge-pill'; pill.textContent=name; badgeShelf.appendChild(pill)}) }
+    function awardBadge(name){ if(!unlockedBadges.includes(name)) unlockedBadges.push(name); updateProgressStats() }
+    function showCelebration(title,text,ms=2400,callback=null){ celebrationTitle.textContent=title; celebrationText.innerHTML=text; celebrationOverlay.classList.add('show'); if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); autoAdvanceTimer=setTimeout(()=>{ celebrationOverlay.classList.remove('show'); if(callback) callback() },ms) }
+    function shuffleArray(arr){ const copy=arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]] } return copy }
+    function currentSubjectMeta(){ return SUBJECT_INDEX[selectedSubjectIndex] || null }
+    function getCurrentItem(){ return filteredItems[selectedItemIndex] || null }
+
+    function normalizeIndex(data){
+      if (data && Array.isArray(data.subjects)) return data.subjects;
+      if (Array.isArray(data)) return data;
+      throw new Error('Expected { "subjects": [...] } or plain array in subjects index.');
+    }
+
+    function normalizeSubject(data, fallbackName=''){
+      if (data && Array.isArray(data.items)) return data;
+      if (Array.isArray(data)) return { subject: fallbackName, items: data };
+      throw new Error('Expected { "subject": "...", "items": [...] } or array of items in subject file.');
+    }
+
+    async function loadIndex(path){
+      loaderBox.classList.add('show');
+      loaderBox.textContent = 'Loading subject index…';
+      try{
+        const res = await fetch(path, {cache:'no-store'});
+        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        SUBJECT_INDEX = normalizeIndex(data);
+        selectedSubjectIndex = 0;
+        subjectCache.clear();
+        renderSubjects();
+        await loadSelectedSubject();
+        loaderBox.textContent = `Loaded ${SUBJECT_INDEX.length} subject entries.`;
+        setStatus('Subject index loaded. Choose a lesson card and start the lesson flow.');
+      }catch(err){
+        SUBJECT_INDEX = FALLBACK_INDEX.subjects;
+        subjectCache.clear();
+        renderSubjects();
+        await loadSelectedSubject();
+        loaderBox.textContent = 'Could not load external subject index, so fallback sample data is active.';
+        setStatus('External subject index could not be loaded here. Fallback sample data is active. Once hosted on GitHub Pages or Wix, your JSON files will load normally.');
+      }
+    }
+
+    async function loadSelectedSubject(){
+      const meta = currentSubjectMeta();
+      if(!meta){ currentSubjectData = {subject:'', items:[]}; filteredItems=[]; renderLessonCards(); refreshHeader(); renderPreview(); return; }
+
+      if(subjectCache.has(meta.subject)){
+        currentSubjectData = subjectCache.get(meta.subject);
+      }else{
+        try{
+          if(meta.file){
+            loaderBox.classList.add('show');
+            loaderBox.textContent = `Loading ${meta.subject}…`;
+            const res = await fetch(meta.file, {cache:'no-store'});
+            if(!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            currentSubjectData = normalizeSubject(data, meta.subject);
+          }else{
+            currentSubjectData = { subject: meta.subject, items: [] };
+          }
+        }catch(err){
+          currentSubjectData = FALLBACK_SUBJECTS[meta.subject] || { subject: meta.subject, items: [] };
+        }
+        subjectCache.set(meta.subject, currentSubjectData);
+      }
+
+      selectedItemIndex = 0;
+      applySearchFilter();
+      refreshHeader();
+      renderPreview();
+      resetLesson();
+      loaderBox.classList.remove('show');
+    }
+
+    function renderSubjects(){
+      subjectList.innerHTML='';
+      SUBJECT_INDEX.forEach((subject,index)=>{
+        const btn=document.createElement('button');
+        btn.className='pill-btn'+(index===selectedSubjectIndex?' active':'');
+        btn.textContent=subject.subject || `Subject ${index+1}`;
+        btn.addEventListener('click', async ()=>{ selectedSubjectIndex=index; renderSubjects(); hintVisible=false; await loadSelectedSubject(); setStatus('Subject selected. Pick a lesson card and start the lesson flow.') });
+        subjectList.appendChild(btn);
+      });
+    }
+
+    function applySearchFilter(){
+      const items = currentSubjectData?.items || [];
+      const q = searchInput.value.trim().toLowerCase();
+      filteredItems = items.filter(item=>{
+        if(!q) return true;
+        const blob = [
+          item.title || '',
+          item.description || '',
+          ...(item.keywords || [])
+        ].join(' ').toLowerCase();
+        return blob.includes(q);
+      });
+      selectedItemIndex = filteredItems.length ? Math.min(selectedItemIndex, filteredItems.length - 1) : 0;
+      renderLessonCards();
+      refreshHeader();
+      renderPreview();
+    }
+
+    function renderLessonCards(){
+      lessonCards.innerHTML='';
+      if(!filteredItems.length){
+        lessonCards.innerHTML = `<div class="tiny-note">No lessons matched this search.</div>`;
+        return;
+      }
+      filteredItems.forEach((item,index)=>{
+        const card = document.createElement('div');
+        card.className = 'thumb-card' + (index===selectedItemIndex ? ' active' : '');
+        card.innerHTML = `
+          <div class="thumb-img">${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.title}">` : '<div class="tiny-note">No image</div>'}</div>
+          <div class="thumb-body">
+            <div class="thumb-title">${item.title || 'Untitled lesson'}</div>
+            <div class="thumb-desc">${item.description || ''}</div>
+          </div>
+        `;
+        card.addEventListener('click', ()=>{ selectedItemIndex=index; renderLessonCards(); refreshHeader(); renderPreview(); resetLesson(); setStatus('Lesson card selected. Choose a size and start the lesson flow.') });
+        lessonCards.appendChild(card);
+      });
+    }
+
+    function renderPreview(){
+      const item=getCurrentItem();
+      if(!item){ previewBox.innerHTML=`<div class="preview-placeholder">No lesson selected yet.</div>`; return; }
+      if(!hintVisible){ previewBox.innerHTML=`<div class="preview-placeholder"><strong>Hint Hidden</strong><br><br>Press <strong>Show Hint Picture</strong> if you want to preview the image.</div>`; return; }
+      previewBox.innerHTML=`<img src="${item.imageUrl}" alt="${item.title} preview" />`;
+    }
+
+    function refreshHeader(){
+      const subject = currentSubjectData || {subject:''};
+      const item=getCurrentItem();
+      currentTitle.textContent = item ? item.title : 'Lesson Board';
+      currentMeta.textContent = item ? `${subject.subject} • ${item.description||'Ready to play.'}` : 'Load a subject index to begin.';
+      quizMeta.textContent = item ? `${subject.subject} • ${item.title}` : 'Answer the questions to continue.';
+    }
+
+    function updateBoardMetrics(){ boardRect=boardShell.getBoundingClientRect(); pieceWidth=boardRect.width/size; pieceHeight=boardRect.height/size }
+    function buildGrid(){ boardGrid.innerHTML=''; boardGrid.style.gridTemplateColumns=`repeat(${size},1fr)`; boardGrid.style.gridTemplateRows=`repeat(${size},1fr)`; for(let i=0;i<size*size;i++){ const cell=document.createElement('div'); cell.className='grid-cell'; boardGrid.appendChild(cell) } }
+    function seededEdge(row,col,side){ const key=`${row}-${col}-${side}-${size}`; if(edgeCache.has(key)) return edgeCache.get(key); const seed=((row+1)*73856093)^((col+1)*19349663)^(side==='right'?83492791:15485863)^(size*11); const value=seed%2===0?1:-1; edgeCache.set(key,value); return value }
+    function edgeValue(row,col,side){ if(side==='top'){ if(row===0) return 0; return -seededEdge(row-1,col,'bottom') } if(side==='left'){ if(col===0) return 0; return -seededEdge(row,col-1,'right') } if(side==='right'){ if(col===size-1) return 0; return seededEdge(row,col,'right') } if(side==='bottom'){ if(row===size-1) return 0; return seededEdge(row,col,'bottom') } return 0 }
+    function makePiecePath(w,h,top,right,bottom,left){
+      const tab=Math.min(w,h)*.18, neck=Math.min(w,h)*.08, thirdW=w/3, thirdH=h/3; let d=`M 0 0`;
+      d+=` L ${thirdW-neck} 0`; if(top!==0){ d+=` C ${thirdW} 0, ${thirdW} ${-top*tab}, ${w/2} ${-top*tab}`; d+=` C ${2*thirdW} ${-top*tab}, ${2*thirdW} 0, ${2*thirdW+neck} 0` } d+=` L ${w} 0`;
+      d+=` L ${w} ${thirdH-neck}`; if(right!==0){ d+=` C ${w} ${thirdH}, ${w+right*tab} ${thirdH}, ${w+right*tab} ${h/2}`; d+=` C ${w+right*tab} ${2*thirdH}, ${w} ${2*thirdH}, ${w} ${2*thirdH+neck}` } d+=` L ${w} ${h}`;
+      d+=` L ${2*thirdW+neck} ${h}`; if(bottom!==0){ d+=` C ${2*thirdW} ${h}, ${2*thirdW} ${h+bottom*tab}, ${w/2} ${h+bottom*tab}`; d+=` C ${thirdW} ${h+bottom*tab}, ${thirdW} ${h}, ${thirdW-neck} ${h}` } d+=` L 0 ${h}`;
+      d+=` L 0 ${2*thirdH+neck}`; if(left!==0){ d+=` C 0 ${2*thirdH}, ${-left*tab} ${2*thirdH}, ${-left*tab} ${h/2}`; d+=` C ${-left*tab} ${thirdH}, 0 ${thirdH}, 0 ${thirdH-neck}` } d+=` L 0 0 Z`;
+      return {d,tab}
+    }
+
+    function buildPieces(){
+      const item = getCurrentItem();
+      if (!item) return;
+      pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); piecesLayer.innerHTML=''; edgeCache.clear(); updateBoardMetrics();
+      const total=size*size; totalStat.textContent=String(total);
+      for(let row=0;row<size;row++){ for(let col=0;col<size;col++){
+        const top=edgeValue(row,col,'top'), right=edgeValue(row,col,'right'), bottom=edgeValue(row,col,'bottom'), left=edgeValue(row,col,'left');
+        const {d,tab}=makePiecePath(pieceWidth,pieceHeight,top,right,bottom,left);
+        const piece={id:`${row}-${col}`,row,col,top,right,bottom,left,path:d,tab,width:pieceWidth,height:pieceHeight,x:0,y:0,imageUrl:item.imageUrl,el:null,groupId:null};
+        pieces.push(piece); pieceById.set(piece.id,piece)
+      }}
+      scatterSinglesToEdges();
+      pieces.forEach(piece=>{ createPieceElement(piece); const group={id:`g-${piece.id}`,pieceIds:[piece.id]}; groups.push(group); groupById.set(group.id,group); piece.groupId=group.id; positionPieceElement(piece) });
+      updateStats();
+    }
+
+    function createPieceElement(piece){
+      const wrap=document.createElement('div'); wrap.className='piece'; wrap.style.width=`${pieceWidth+piece.tab*2}px`; wrap.style.height=`${pieceHeight+piece.tab*2}px`; wrap.dataset.id=piece.id;
+      const svgNS='http://www.w3.org/2000/svg'; const svg=document.createElementNS(svgNS,'svg');
+      svg.setAttribute('viewBox',`${-piece.tab} ${-piece.tab} ${pieceWidth+piece.tab*2} ${pieceHeight+piece.tab*2}`); svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
+      const defs=document.createElementNS(svgNS,'defs'), pattern=document.createElementNS(svgNS,'pattern'), patternId=`pat-${piece.id.replace(/[^a-zA-Z0-9]/g,'')}`;
+      pattern.setAttribute('id',patternId); pattern.setAttribute('patternUnits','userSpaceOnUse'); pattern.setAttribute('x',String(-piece.col*pieceWidth)); pattern.setAttribute('y',String(-piece.row*pieceHeight)); pattern.setAttribute('width',String(boardRect.width)); pattern.setAttribute('height',String(boardRect.height));
+      const image=document.createElementNS(svgNS,'image'); image.setAttribute('href',piece.imageUrl); image.setAttribute('x','0'); image.setAttribute('y','0'); image.setAttribute('width',String(boardRect.width)); image.setAttribute('height',String(boardRect.height)); image.setAttribute('preserveAspectRatio','none');
+      pattern.appendChild(image); defs.appendChild(pattern); svg.appendChild(defs);
+      const path=document.createElementNS(svgNS,'path'); path.setAttribute('d',piece.path); path.setAttribute('transform',`translate(${piece.tab}, ${piece.tab})`); path.setAttribute('fill',`url(#${patternId})`);
+      const stroke=document.createElementNS(svgNS,'path'); stroke.setAttribute('d',piece.path); stroke.setAttribute('transform',`translate(${piece.tab}, ${piece.tab})`); stroke.setAttribute('class','stroke');
+      svg.appendChild(path); svg.appendChild(stroke); wrap.appendChild(svg); piecesLayer.appendChild(wrap); piece.el=wrap; wrap.addEventListener('pointerdown',onPointerDown); wrap.addEventListener('dragstart',e=>e.preventDefault())
+    }
+
+    function positionPieceElement(piece){ piece.el.style.left=`${piece.x-piece.tab}px`; piece.el.style.top=`${piece.y-piece.tab}px`; piece.el.classList.toggle('connected',getGroup(piece.groupId).pieceIds.length>1) }
+    function getGroup(groupId){ return groupById.get(groupId) }
+    function getGroupPieces(groupId){ return getGroup(groupId).pieceIds.map(id=>pieceById.get(id)) }
+    function getNeighborDirection(a,b){ if(a.row===b.row&&a.col+1===b.col) return 'right'; if(a.row===b.row&&a.col-1===b.col) return 'left'; if(a.col===b.col&&a.row+1===b.row) return 'down'; if(a.col===b.col&&a.row-1===b.row) return 'up'; return null }
+    function expectedOffset(a,b){ const dir=getNeighborDirection(a,b); if(dir==='right') return {dx:pieceWidth,dy:0}; if(dir==='left') return {dx:-pieceWidth,dy:0}; if(dir==='down') return {dx:0,dy:pieceHeight}; if(dir==='up') return {dx:0,dy:-pieceHeight}; return null }
+
+    function onPointerDown(e){
+      if(!puzzleStarted) return; const piece=pieceById.get(e.currentTarget.dataset.id); if(!piece) return;
+      activeGroup=getGroup(piece.groupId); dragMembers=getGroupPieces(activeGroup.id); dragStartPositions=dragMembers.map(p=>({id:p.id,x:p.x,y:p.y})); dragPointerStartX=e.clientX; dragPointerStartY=e.clientY;
+      dragMembers.forEach((p,idx)=>{ p.el.classList.add('dragging'); p.el.style.zIndex=String(zCounter+idx) }); zCounter+=dragMembers.length+2;
+      e.currentTarget.setPointerCapture(e.pointerId); window.addEventListener('pointermove',onPointerMove); window.addEventListener('pointerup',onPointerUp)
+    }
+
+    function onPointerMove(e){
+      if(!activeGroup) return; const dx=e.clientX-dragPointerStartX, dy=e.clientY-dragPointerStartY;
+      dragMembers.forEach(p=>{ const start=dragStartPositions.find(s=>s.id===p.id); p.x=start.x+dx; p.y=start.y+dy; positionPieceElement(p) })
+    }
+
+    function onPointerUp(){
+      if(!activeGroup) return; dragMembers.forEach(p=>p.el.classList.remove('dragging')); moves++;
+      constrainGroupToBoard(activeGroup.id); let mergedAnything=false, didMerge;
+      do{ didMerge=tryMergeGroup(activeGroup.id); mergedAnything=mergedAnything||didMerge }while(didMerge&&activeGroup);
+      updateStats(); checkCompletion();
+      if(mergedAnything){ const count=getGroup(activeGroup.id).pieceIds.length; setStatus(`Nice! Connected pieces now move together. Group size: ${count}.`) }
+      moveSinglesToTopLayer();
+      dragMembers=[]; dragStartPositions=[]; activeGroup=null; window.removeEventListener('pointermove',onPointerMove); window.removeEventListener('pointerup',onPointerUp)
+    }
+
+    function constrainGroupToBoard(groupId){
+      const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId); let shiftX=0, shiftY=0;
+      if(bbox.minX<-20) shiftX=-20-bbox.minX; if(bbox.minY<-20) shiftY=-20-bbox.minY; if(bbox.maxX>boardRect.width+20) shiftX=(boardRect.width+20)-bbox.maxX; if(bbox.maxY>boardRect.height+20) shiftY=(boardRect.height+20)-bbox.maxY;
+      members.forEach(p=>{ p.x+=shiftX; p.y+=shiftY; positionPieceElement(p) })
+    }
+
+    function getGroupBounds(groupId){
+      const members=getGroupPieces(groupId), minX=Math.min(...members.map(p=>p.x)), minY=Math.min(...members.map(p=>p.y)), maxX=Math.max(...members.map(p=>p.x+pieceWidth)), maxY=Math.max(...members.map(p=>p.y+pieceHeight));
+      return {minX,minY,maxX,maxY,width:maxX-minX,height:maxY-minY}
+    }
+
+    function tryMergeGroup(groupId){
+      const group=getGroup(groupId); if(!group) return false; const candidates=groups.filter(g=>g.id!==groupId), snapThreshold=Math.min(pieceWidth,pieceHeight)*.22;
+      for(const other of candidates){
+        const groupPieces=getGroupPieces(group.id), otherPieces=getGroupPieces(other.id);
+        for(const a of groupPieces){ for(const b of otherPieces){
+          const expected=expectedOffset(a,b); if(!expected) continue; const actualDx=b.x-a.x, actualDy=b.y-a.y, errX=expected.dx-actualDx, errY=expected.dy-actualDy, dist=Math.hypot(errX,errY);
+          if(dist<=snapThreshold){ otherPieces.forEach(p=>{ p.x+=errX; p.y+=errY }); mergeGroups(group.id,other.id); return true }
+        }}
+      } return false
+    }
+
+    function mergeGroups(groupAId,groupBId){
+      const groupA=getGroup(groupAId), groupB=getGroup(groupBId); if(!groupA||!groupB) return;
+      groupB.pieceIds.forEach(id=>{ const piece=pieceById.get(id); piece.groupId=groupA.id; groupA.pieceIds.push(id) });
+      groups=groups.filter(g=>g.id!==groupB.id); groupById.delete(groupB.id); getGroupPieces(groupA.id).forEach(positionPieceElement); activeGroup=groupA; dragMembers=getGroupPieces(groupA.id);
+      const bringForward=dragMembers.slice().sort((a,b)=>(a.row+a.col)-(b.row+b.col)); bringForward.forEach((p,idx)=>{ p.el.style.zIndex=String(zCounter+idx) }); zCounter+=bringForward.length+2
+    }
+
+    function updateStats(){ movesStat.textContent=String(moves); const largestGroup=groups.length?Math.max(...groups.map(g=>g.pieceIds.length)):0; connectedStat.textContent=String(largestGroup); totalStat.textContent=String(pieces.length) }
+    function moveSinglesToTopLayer(){ const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0])); singles.forEach((piece,idx)=>{ piece.el.style.zIndex=String(zCounter+idx) }); if(singles.length) zCounter+=singles.length+2 }
+
+    function scatterSinglesToEdges(){
+      const pad=10,total=pieces.length,topCount=Math.ceil(total/4),rightCount=Math.ceil((total-topCount)/3),bottomCount=Math.ceil((total-topCount-rightCount)/2),leftCount=total-topCount-rightCount-bottomCount,positions=[];
+      const topSlots=Math.max(1,topCount), rightSlots=Math.max(1,rightCount), bottomSlots=Math.max(1,bottomCount), leftSlots=Math.max(1,leftCount);
+      for(let i=0;i<topCount;i++){ const x=(boardRect.width-pieceWidth)*(topSlots===1?.5:i/(topSlots-1)); positions.push({x,y:pad}) }
+      for(let i=0;i<rightCount;i++){ const y=(boardRect.height-pieceHeight)*(rightSlots===1?.5:i/(rightSlots-1)); positions.push({x:boardRect.width-pieceWidth-pad,y}) }
+      for(let i=0;i<bottomCount;i++){ const x=(boardRect.width-pieceWidth)*(bottomSlots===1?.5:1-i/(bottomSlots-1)); positions.push({x,y:boardRect.height-pieceHeight-pad}) }
+      for(let i=0;i<leftCount;i++){ const y=(boardRect.height-pieceHeight)*(leftSlots===1?.5:1-i/(leftSlots-1)); positions.push({x:pad,y}) }
+      pieces.forEach((piece,idx)=>{ const pos=positions[idx]||{x:Math.random()*Math.max(20,boardRect.width-pieceWidth-20),y:Math.random()*Math.max(20,boardRect.height-pieceHeight-20)}, jitter=6; piece.x=Math.max(-10,Math.min(boardRect.width-pieceWidth+10,pos.x+(Math.random()*jitter-jitter/2))); piece.y=Math.max(-10,Math.min(boardRect.height-pieceHeight+10,pos.y+(Math.random()*jitter-jitter/2))) })
+    }
+
+    function moveSinglesToEdges(){
+      if(!pieces.length) return; const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0])); if(!singles.length){ setStatus('All pieces are already connected into larger groups.'); return }
+      const pad=14, usableW=boardRect.width-pieceWidth-pad*2, usableH=boardRect.height-pieceHeight-pad*2, topSlots=[], rightSlots=[], bottomSlots=[], leftSlots=[], countPerSide=Math.ceil(singles.length/4);
+      for(let i=0;i<countPerSide;i++){ const t=countPerSide===1?.5:i/(countPerSide-1); topSlots.push({x:pad+usableW*t,y:pad}); rightSlots.push({x:pad+usableW,y:pad+usableH*t}); bottomSlots.push({x:pad+usableW*(1-t),y:pad+usableH}); leftSlots.push({x:pad,y:pad+usableH*(1-t)}) }
+      const slots=[...topSlots,...rightSlots,...bottomSlots,...leftSlots];
+      singles.forEach((piece,idx)=>{ const slot=slots[idx%slots.length], jitter=4; piece.x=slot.x+(Math.random()*jitter-jitter/2); piece.y=slot.y+(Math.random()*jitter-jitter/2); piece.el.style.zIndex=String(zCounter+idx); positionPieceElement(piece) });
+      zCounter+=singles.length+2; setStatus('Loose pieces were spread around the outer ring and brought to the top.')
+    }
+
+    function startInlineTransition(){
+      const item = getCurrentItem(); if (!item) return;
+      setStatus('Puzzle complete! The image is coming alive...'); boardShell.classList.add('flash'); setTimeout(()=>boardShell.classList.remove('flash'),700);
+      inlineVideo.src=item.videoUrl; inlineVideo.load(); piecesLayer.style.opacity='0'; piecesLayer.style.transform='scale(1.03)'; inlineVideo.style.opacity='1';
+      setTimeout(()=>{ inlineVideo.play().catch(()=>{ setStatus('Tap play on the video to continue.') }) },250)
+    }
+
+    function checkCompletion(){ if(groups.length===1&&groups[0].pieceIds.length===size*size){ puzzleStarted=false; startInlineTransition() } }
+
+    function showQuiz(){
+      const item = getCurrentItem(); if (!item) return;
+      quizShell.classList.add('show'); currentQuizOrder = shuffleArray((item.quiz||[]).map(q=>({q:q.q,choices:q.choices.slice(),answer:q.answer,explanation:q.explanation,_shuffledChoices:[]})));
+      quizIndex=0; quizScore=0; quizAnswered=false; resultsBox.classList.remove('show'); resultsBox.innerHTML=''; renderQuizQuestion(); quizShell.scrollIntoView({behavior:'smooth',block:'start'}); setStatus('Video finished. Now answer the quiz to continue.')
+    }
+
+    function renderQuizQuestion(){
+      const q=currentQuizOrder[quizIndex]; if(!q) return;
+      const shuffledChoices=shuffleArray(q.choices.map((choice,index)=>({text:choice,correct:index===q.answer}))); q._shuffledChoices=shuffledChoices;
+      quizProgress.textContent=`Question ${quizIndex+1} of ${currentQuizOrder.length}`; questionText.textContent=q.q; explainText.textContent=''; choicesWrap.innerHTML=''; quizAnswered=false; nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none';
+      shuffledChoices.forEach((choiceObj,index)=>{ const btn=document.createElement('button'); btn.className='choice-btn'; btn.textContent=choiceObj.text; btn.addEventListener('click',()=>answerQuestion(index,btn)); choicesWrap.appendChild(btn) })
+    }
+
+    function answerQuestion(choiceIndex,clickedBtn){
+      if(quizAnswered) return; quizAnswered=true; const q=currentQuizOrder[quizIndex], allButtons=[...choicesWrap.querySelectorAll('button')], shuffled=q._shuffledChoices||[];
+      allButtons.forEach((btn,idx)=>{ btn.disabled=true; if(shuffled[idx]&&shuffled[idx].correct) btn.classList.add('correct') });
+      if(shuffled[choiceIndex]&&shuffled[choiceIndex].correct){ clickedBtn.classList.add('correct'); quizScore++; explainText.textContent='Correct. '+q.explanation } else { clickedBtn.classList.add('wrong'); explainText.textContent='Not quite. '+q.explanation }
+      if(quizIndex<currentQuizOrder.length-1){ nextQuestionBtn.style.display='inline-block' } else { finishQuizBtn.style.display='inline-block' }
+    }
+
+    function finishQuiz(){
+      const quizLength=currentQuizOrder.length||0, pct=quizLength?Math.round((quizScore/quizLength)*100):0; totalScoreAcrossLessons+=quizScore; lessonsCompleted+=1;
+      const item=getCurrentItem(), badgeName=pct===100?`${item.title} Mastery Badge`:pct>=70?`${item.title} Scholar Badge`:`${item.title} Explorer Badge`;
+      awardBadge(badgeName); resultsBox.classList.add('show'); resultsBox.innerHTML=`<strong>Quiz Complete</strong><br><br>You scored <strong>${quizScore} / ${quizLength}</strong> (${pct}%).<br><br><strong>Badge unlocked:</strong> ${badgeName}<br><br>Next lesson in this subject will load automatically.`;
+      nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; updateProgressStats(); setStatus('Quiz complete. Preparing the next lesson...');
+      showCelebration('Badge Unlocked 🎉',`You earned <strong>${badgeName}</strong>.<br>Total score so far: <strong>${totalScoreAcrossLessons}</strong><br><br>Loading the next lesson...`,2800,goToNextLesson)
+    }
+
+    function goToNextLesson(){
+      if(selectedItemIndex<filteredItems.length-1){ selectedItemIndex++; renderLessonCards(); refreshHeader(); hintVisible=false; renderPreview(); autoStartCurrentLesson(); return }
+      const subject=currentSubjectData || {subject:''};
+      resultsBox.classList.add('show'); resultsBox.innerHTML=`<strong>Subject Complete 🎉</strong><br><br>You finished this subject. Add more lessons here and the auto-next flow will keep rolling.`; setStatus('This subject is complete.');
+      showCelebration('Subject Complete 🌟',`You completed <strong>${subject.subject}</strong>.<br>Badges earned: <strong>${unlockedBadges.length}</strong>`,2600,()=>{ resetLesson(); hintVisible=false; renderPreview() })
+    }
+
+    function resetBoardOnly(){ piecesLayer.innerHTML=''; boardGrid.innerHTML=''; pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); moves=0; puzzleStarted=false; activeGroup=null; dragMembers=[]; dragStartPositions=[]; updateStats() }
+    function resetLesson(){ if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); celebrationOverlay.classList.remove('show'); resetBoardOnly(); inlineVideo.pause(); inlineVideo.removeAttribute('src'); inlineVideo.load(); inlineVideo.style.opacity='0'; piecesLayer.style.opacity='1'; piecesLayer.style.transform='scale(1)'; quizShell.classList.remove('show'); resultsBox.classList.remove('show'); resultsBox.innerHTML=''; nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; quizIndex=0; quizScore=0; quizAnswered=false; currentQuizOrder=[]; updateProgressStats() }
+    function autoStartCurrentLesson(){ size=Number(difficulty.value); resetLesson(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Next lesson loaded automatically. Drag pieces into place to begin.') }
+    function startLessonFlow(){ if(!getCurrentItem()){ setStatus('Please choose a lesson first.'); return } size=Number(difficulty.value); resetLesson(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Drag pieces into place. Matching neighbors snap together and move as one group.') }
+
+    startBtn.addEventListener('click',startLessonFlow);
+    edgeBtn.addEventListener('click',moveSinglesToEdges);
+    showSolvedBtn.addEventListener('click',()=>{ hintVisible=true; renderPreview(); setStatus('Hint picture shown.') });
+    resetBtn.addEventListener('click',()=>{ resetLesson(); hintVisible=false; renderPreview(); setStatus('Lesson reset. Choose a size and start again.') });
+    nextQuestionBtn.addEventListener('click',()=>{ quizIndex++; renderQuizQuestion() });
+    finishQuizBtn.addEventListener('click',finishQuiz);
+    inlineVideo.addEventListener('ended',showQuiz);
+    reloadIndexBtn.addEventListener('click',()=>loadIndex(indexPathInput.value.trim()||'data/subjects-index.json'));
+    searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
+    window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; resetLesson(); hintVisible=false; renderPreview(); setStatus('Board resized. Start the lesson again to keep the layout clean.') });
+
+    renderSubjects(); updateProgressStats(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
+  </script>
+</body>
+</html>
