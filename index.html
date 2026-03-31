@@ -128,13 +128,37 @@
       box-shadow:0 0 18px rgba(244,180,0,.22) inset;
     }
 
+
+    body{
+      -webkit-user-select:none;
+      user-select:none;
+      -webkit-touch-callout:none;
+    }
+    .board-shell,
+    .pieces-layer,
+    .tray,
+    .tray-box,
+    .piece{
+      touch-action:none;
+    }
+    .piece{
+      cursor:grab;
+    }
+    .piece:active{
+      cursor:grabbing;
+    }
+    @media (max-width: 900px){
+      .thumb-card{min-height:140px}
+      .tray-box{min-height:180px}
+    }
+
 </style>
 </head>
 <body>
   <div class="wrap">
     <section class="hero">
       <h1>WGLT JSON Lesson Flow V3</h1>
-      <p class="sub">Now with a real loose-piece tray system. Instead of squeezing pieces into the same board, singles can park in left and right trays. Much less traffic jam, much more puzzle breathing room. 🧩</p>
+      <p class="sub">Now with a real loose-piece tray system and touch optimization. Instead of squeezing pieces into the same board, singles can park in left and right trays, and the drag surfaces are tuned for fingers on touch monitors, tablets, and phones. 🧩</p>
     </section>
 
     <div class="layout">
@@ -564,6 +588,7 @@
     function expectedOffset(a,b){ const dir=getNeighborDirection(a,b); if(dir==='right') return {dx:pieceWidth,dy:0}; if(dir==='left') return {dx:-pieceWidth,dy:0}; if(dir==='down') return {dx:0,dy:pieceHeight}; if(dir==='up') return {dx:0,dy:-pieceHeight}; return null }
 
     function onPointerDown(e){
+      e.preventDefault();
       if(!puzzleStarted) return;
       const piece=pieceById.get(e.currentTarget.dataset.id); if(!piece) return;
       activeGroup=getGroup(piece.groupId);
@@ -662,7 +687,7 @@
         for(const a of groupPieces){ for(const b of otherPieces){
           const expected=expectedOffset(a,b); if(!expected) continue;
           const actualDx=b.x-a.x, actualDy=b.y-a.y, errX=expected.dx-actualDx, errY=expected.dy-actualDy, dist=Math.hypot(errX,errY);
-          if(dist<=snapThreshold){ otherPieces.forEach(p=>{ p.x+=errX; p.y+=errY; p.zone='board' }); mergeGroups(group.id,other.id); return true }
+          if(dist<=snapThreshold || (size<=4 && dist<=Math.min(pieceWidth,pieceHeight)*0.32)){ otherPieces.forEach(p=>{ p.x+=errX; p.y+=errY; p.zone='board' }); mergeGroups(group.id,other.id); return true }
         }}
       } return false
     }
@@ -696,7 +721,7 @@
         const trayWidth = targetTray.clientWidth || 150;
         const columns = mobile ? Math.max(2, Math.floor((trayWidth-12) / Math.max(36, pieceWidth*mobileScale))) : 1;
         const gap = 8;
-        const scale = mobile ? mobileScale : desktopScale;
+        const scale = mobile ? Math.max(mobileScale, 0.56) : Math.max(desktopScale, 0.62);
         const itemW = pieceWidth * scale;
         const itemH = pieceHeight * scale;
         const neededRows = Math.max(1, Math.ceil(piecesForTray.length / columns));
