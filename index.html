@@ -56,9 +56,16 @@
     .stage-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
     .stage-label{color:var(--muted);font-size:14px}
     .workspace{display:grid;grid-template-columns:var(--traySize) var(--solveSize) var(--traySize);gap:14px;justify-content:center;align-items:start}
-    .tray{min-height:var(--solveSize);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:10px;position:relative}
+    .tray{
+      min-height:var(--solveSize);height:var(--solveSize);background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:10px;position:relative;
+      display:flex;flex-direction:column;overflow:hidden
+    }
     .tray-title{text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px}
-    .tray-box{position:relative;height:calc(var(--solveSize) - 24px);overflow:hidden;border-radius:16px;background:rgba(255,255,255,.02)}
+    .tray-box{
+      position:relative;flex:1;overflow-y:auto;overflow-x:hidden;border-radius:16px;background:rgba(255,255,255,.02);
+      scrollbar-width:thin;padding-right:4px
+    }
     .board-shell{position:relative;width:min(100%,var(--solveSize));aspect-ratio:1/1;margin:0 auto;background:radial-gradient(circle at center,rgba(255,255,255,.075),rgba(255,255,255,.03));border-radius:24px;border:2px solid rgba(255,255,255,.08);overflow:hidden}
     .board-grid{position:absolute;inset:0;display:grid;pointer-events:none;z-index:1}
     .grid-cell{border:1px dashed rgba(255,255,255,.12)}
@@ -91,8 +98,15 @@
     .flash{animation:pulseGlow .55s ease}
     @media (max-width:1300px){
       .workspace{grid-template-columns:1fr;justify-items:center}
-      .tray{width:min(100%,var(--solveSize));min-height:190px}
-      .tray-box{height:160px;overflow:auto;white-space:nowrap}
+      .tray{
+      min-height:var(--solveSize);height:var(--solveSize);background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:10px;position:relative;
+      display:flex;flex-direction:column;overflow:hidden
+    }
+      .tray-box{
+      position:relative;flex:1;overflow-y:auto;overflow-x:hidden;border-radius:16px;background:rgba(255,255,255,.02);
+      scrollbar-width:thin;padding-right:4px
+    }
     }
     @media (max-width:1100px){.layout{grid-template-columns:1fr}.thumb-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.thumb-grid{grid-template-columns:1fr}}
@@ -104,6 +118,15 @@
   background: rgba(255,255,255,0.4);
   border-radius: 6px;
 }
+
+
+    .tray-box::-webkit-scrollbar{width:8px}
+    .tray-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.35);border-radius:8px}
+    .ghost-outline{
+      position:absolute;pointer-events:none;z-index:3;border:2px dashed rgba(244,180,0,.85);
+      background:rgba(244,180,0,.12);display:none;border-radius:10px;
+      box-shadow:0 0 18px rgba(244,180,0,.22) inset;
+    }
 
 </style>
 </head>
@@ -199,12 +222,13 @@
 
         <div class="workspace">
           <div class="tray">
-            <div class="tray-title">Loose Pieces Tray A</div>
+            <div class="tray-title">Edge Pieces Tray</div>
             <div id="leftTray" class="tray-box"></div>
           </div>
 
           <div class="board-shell" id="boardShell">
             <div id="boardGrid" class="board-grid"></div>
+            <div id="ghostOutline" class="ghost-outline"></div>
             <video id="inlineVideo" class="board-video" playsinline controls></video>
             <div id="piecesLayer" class="pieces-layer"></div>
             <div id="celebrationOverlay" class="celebration-overlay">
@@ -216,7 +240,7 @@
           </div>
 
           <div class="tray">
-            <div class="tray-title">Loose Pieces Tray B</div>
+            <div class="tray-title">Inner Pieces Tray</div>
             <div id="rightTray" class="tray-box"></div>
           </div>
         </div>
@@ -282,6 +306,7 @@
     const currentMeta = document.getElementById('currentMeta');
     const boardShell = document.getElementById('boardShell');
     const boardGrid = document.getElementById('boardGrid');
+    const ghostOutline = document.getElementById('ghostOutline');
     const piecesLayer = document.getElementById('piecesLayer');
     const inlineVideo = document.getElementById('inlineVideo');
     const leftTray = document.getElementById('leftTray');
@@ -466,6 +491,24 @@
       quizMeta.textContent = item ? `${subject.subject} • ${item.title}` : 'Answer the questions to continue.';
     }
 
+
+    function isEdgePiece(piece){
+      return piece.row===0 || piece.col===0 || piece.row===size-1 || piece.col===size-1;
+    }
+
+    function showGhostForPiece(piece){
+      if(!(size>=2 && size<=4)){ ghostOutline.style.display='none'; return; }
+      ghostOutline.style.display='block';
+      ghostOutline.style.left = `${piece.col * pieceWidth}px`;
+      ghostOutline.style.top = `${piece.row * pieceHeight}px`;
+      ghostOutline.style.width = `${pieceWidth}px`;
+      ghostOutline.style.height = `${pieceHeight}px`;
+    }
+
+    function hideGhost(){
+      ghostOutline.style.display='none';
+    }
+
     function updateBoardMetrics(){ boardRect=boardShell.getBoundingClientRect(); pieceWidth=boardRect.width/size; pieceHeight=boardRect.height/size }
     function buildGrid(){ boardGrid.innerHTML=''; boardGrid.style.gridTemplateColumns=`repeat(${size},1fr)`; boardGrid.style.gridTemplateRows=`repeat(${size},1fr)`; for(let i=0;i<size*size;i++){ const cell=document.createElement('div'); cell.className='grid-cell'; boardGrid.appendChild(cell) } }
     function seededEdge(row,col,side){ const key=`${row}-${col}-${side}-${size}`; if(edgeCache.has(key)) return edgeCache.get(key); const seed=((row+1)*73856093)^((col+1)*19349663)^(side==='right'?83492791:15485863)^(size*11); const value=seed%2===0?1:-1; edgeCache.set(key,value); return value }
@@ -563,8 +606,19 @@
       const dx=e.clientX-dragPointerStartX, dy=e.clientY-dragPointerStartY;
       dragMembers.forEach(p=>{
         const start=dragStartPositions.find(s=>s.id===p.id);
-        p.x=start.x+dx; p.y=start.y+dy; p.zone='board'; positionPieceElement(p)
-      })
+        p.x=start.x+dx; p.y=start.y+dy; p.zone='board'; positionPieceElement(p);
+      });
+      if(dragMembers.length===1 && size>=2 && size<=4){
+        const p = dragMembers[0];
+        const dist = Math.hypot(p.x - (p.col*pieceWidth), p.y - (p.row*pieceHeight));
+        if(dist <= Math.min(pieceWidth,pieceHeight)*0.5){
+          showGhostForPiece(p);
+        } else {
+          hideGhost();
+        }
+      } else {
+        hideGhost();
+      }
     }
 
     function onPointerUp(){
@@ -634,57 +688,52 @@
       leftTray.innerHTML=''; rightTray.innerHTML='';
       const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0]));
       const mobile = window.matchMedia('(max-width: 1300px)').matches;
-      const trayA = leftTray.getBoundingClientRect();
-      const trayB = rightTray.getBoundingClientRect();
 
-      singles.forEach((piece,idx)=>{
-        const targetTray = idx % 2 === 0 ? leftTray : rightTray;
-        targetTray.appendChild(piece.el);
-        piece.zone='tray';
-        piece.el.classList.add('tray-piece');
+      const edgeSingles = singles.filter(isEdgePiece);
+      const innerSingles = singles.filter(p=>!isEdgePiece(p));
 
-        if(mobile){
-          const cols = Math.max(2, Math.floor(targetTray.clientWidth / Math.max(50, pieceWidth * 0.38)));
-          const scale = Math.min(0.48, (targetTray.clientWidth - 12) / (pieceWidth * Math.max(1, cols)));
-          const w = pieceWidth * scale;
-          const h = pieceHeight * scale;
-          const col = Math.floor((idx/2) % cols);
-          const row = Math.floor((idx/2) / cols);
+      function layoutTray(targetTray, piecesForTray, desktopScale, mobileScale){
+        const trayWidth = targetTray.clientWidth || 150;
+        const columns = mobile ? Math.max(2, Math.floor((trayWidth-12) / Math.max(36, pieceWidth*mobileScale))) : 1;
+        const gap = 8;
+        const scale = mobile ? mobileScale : desktopScale;
+        const itemW = pieceWidth * scale;
+        const itemH = pieceHeight * scale;
+        const neededRows = Math.max(1, Math.ceil(piecesForTray.length / columns));
+        const virtualHeight = 8 + neededRows * (itemH + gap) + 12;
+        const spacer = document.createElement('div');
+        spacer.style.position = 'relative';
+        spacer.style.width = '100%';
+        spacer.style.height = `${virtualHeight}px`;
+        targetTray.appendChild(spacer);
+
+        piecesForTray.forEach((piece, idx)=>{
+          spacer.appendChild(piece.el);
+          piece.zone='tray';
+          piece.el.classList.add('tray-piece');
           piece.el.style.transformOrigin='top left';
           piece.el.style.transform=`scale(${scale})`;
-          piece.el.style.left=`${8 + col * (w + 6)}px`;
-          piece.el.style.top=`${8 + row * (h + 6)}px`;
-        }else{
-          const trayWidth = targetTray.clientWidth || 150;
-          const scale = Math.min(0.58, (trayWidth - 20) / pieceWidth);
-          const w = pieceWidth * scale;
-          const h = pieceHeight * scale;
-          const row = Math.floor(idx/2);
-          piece.el.style.transformOrigin='top left';
-          piece.el.style.transform=`scale(${scale})`;
-          piece.el.style.left=`${Math.max(6, (trayWidth - w) / 2)}px`;
-          piece.el.style.top=`${8 + row * (h + 8)}px`;
-        }
-      });
+          const col = mobile ? idx % columns : 0;
+          const row = mobile ? Math.floor(idx / columns) : idx;
+          const left = mobile ? 8 + col * (itemW + gap) : Math.max(6, (trayWidth - itemW) / 2);
+          const top = 8 + row * (itemH + gap);
+          piece.el.style.left=`${left}px`;
+          piece.el.style.top=`${top}px`;
+          piece.el.style.zIndex=String(zCounter++);
+        });
+      }
+
+      layoutTray(leftTray, edgeSingles, 0.58, 0.48);
+      layoutTray(rightTray, innerSingles, 0.58, 0.48);
 
       groups.filter(g=>g.pieceIds.length>1).forEach(g=>{
         getGroupPieces(g.id).forEach(p=>{
-          if(p.zone!=='board'){
-            p.zone='board';
-            p.el.style.transform='scale(1)';
-            p.el.style.transformOrigin='top left';
-            piecesLayer.appendChild(p.el);
-            positionPieceElement(p);
-          } else {
-            p.el.style.transform='scale(1)';
-            piecesLayer.appendChild(p.el);
-            positionPieceElement(p);
-          }
+          p.zone='board';
+          p.el.style.transform='scale(1)';
+          p.el.style.transformOrigin='top left';
+          piecesLayer.appendChild(p.el);
+          positionPieceElement(p);
         });
-      });
-
-      singles.forEach(piece=>{
-        piece.el.style.zIndex=String(zCounter++);
       });
     }
 
@@ -754,7 +803,7 @@
     inlineVideo.addEventListener('ended',showQuiz);
     reloadIndexBtn.addEventListener('click',()=>loadIndex(indexPathInput.value.trim()||'data/subjects-index.json'));
     searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
-    window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; if(groups.filter(g=>g.pieceIds.length===1).length){ organizeLoosePiecesToTrays(); } });
+    window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; organizeLoosePiecesToTrays(); hideGhost(); });
 
     loadSavedProgress(); updateProgressStats(); renderSubjects(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
   </script>
