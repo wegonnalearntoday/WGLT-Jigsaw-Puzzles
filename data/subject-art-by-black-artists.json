@@ -1,4 +1,142 @@
-{
-  "subject": "Art by Black Artists",
-  "items": []
-}
+[
+  {
+    "title": "Jacob Lawrence",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "Painter known for dynamic storytelling and The Migration Series.",
+    "keywords": [
+      "artist",
+      "painting",
+      "migration series",
+      "history"
+    ],
+    "quiz": [
+      {
+        "q": "Jacob Lawrence was best known as what?",
+        "choices": [
+          "A painter and storyteller",
+          "A football coach",
+          "A pilot",
+          "A chemist"
+        ],
+        "answer": 0,
+        "explanation": "Lawrence was a painter known for narrative works."
+      },
+      {
+        "q": "Which major work is Jacob Lawrence famous for?",
+        "choices": [
+          "The Migration Series",
+          "The Moon Series",
+          "The Engine Series",
+          "The Volcano Series"
+        ],
+        "answer": 0,
+        "explanation": "The Migration Series is one of his best known works."
+      },
+      {
+        "q": "His paintings often focused on what?",
+        "choices": [
+          "History and everyday life",
+          "Only fantasy dragons",
+          "Ocean currents",
+          "Computer code"
+        ],
+        "answer": 0,
+        "explanation": "He often painted history and daily life."
+      },
+      {
+        "q": "Why do teachers use Lawrence in lessons?",
+        "choices": [
+          "His art helps tell historical stories",
+          "He invented a vaccine",
+          "He built railroads",
+          "He wrote opera music"
+        ],
+        "answer": 0,
+        "explanation": "His art makes history visual and accessible."
+      },
+      {
+        "q": "Jacob Lawrence used art to do what?",
+        "choices": [
+          "Show movement, struggle, and change",
+          "Design shoes only",
+          "Map planets",
+          "Teach swimming"
+        ],
+        "answer": 0,
+        "explanation": "His art conveys movement, struggle, and historical change."
+      }
+    ]
+  },
+  {
+    "title": "Kehinde Wiley",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "Portrait artist known for bold backgrounds and reimagined classical poses.",
+    "keywords": [
+      "artist",
+      "portrait",
+      "contemporary",
+      "painting"
+    ],
+    "quiz": [
+      {
+        "q": "Kehinde Wiley is best known for what kind of art?",
+        "choices": [
+          "Portrait painting",
+          "Landscape gardening",
+          "Pottery only",
+          "Film editing"
+        ],
+        "answer": 0,
+        "explanation": "Wiley is known for portrait painting."
+      },
+      {
+        "q": "His portraits often place subjects in what style?",
+        "choices": [
+          "Bold, decorative backgrounds",
+          "Empty white rooms only",
+          "Underwater caves",
+          "Snowstorms"
+        ],
+        "answer": 0,
+        "explanation": "His portraits often use bold decorative backgrounds."
+      },
+      {
+        "q": "Why is Wiley's work important?",
+        "choices": [
+          "It reimagines who is seen in grand portrait traditions",
+          "It invented a camera",
+          "It created a new sport",
+          "It teaches carpentry"
+        ],
+        "answer": 0,
+        "explanation": "His work challenges traditional portrait conventions."
+      },
+      {
+        "q": "Wiley's art often connects the present with what?",
+        "choices": [
+          "Classical portrait traditions",
+          "Only cartoons",
+          "Farm tools",
+          "Traffic signs"
+        ],
+        "answer": 0,
+        "explanation": "He often reworks classical portrait styles."
+      },
+      {
+        "q": "What is one big theme in Wiley's portraits?",
+        "choices": [
+          "Visibility and representation",
+          "Only weather",
+          "Cooking",
+          "Rocket fuel"
+        ],
+        "answer": 0,
+        "explanation": "His work highlights representation and visibility."
+      }
+    ]
+  }
+]

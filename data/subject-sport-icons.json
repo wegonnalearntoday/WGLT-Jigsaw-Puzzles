@@ -1,4 +1,142 @@
-{
-  "subject": "Sport Icons",
-  "items": []
-}
+[
+  {
+    "title": "Jackie Robinson",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "Baseball pioneer remembered for breaking barriers in professional sports.",
+    "keywords": [
+      "sports",
+      "baseball",
+      "barriers",
+      "history"
+    ],
+    "quiz": [
+      {
+        "q": "Jackie Robinson is famous in which sport?",
+        "choices": [
+          "Baseball",
+          "Tennis",
+          "Swimming",
+          "Hockey"
+        ],
+        "answer": 0,
+        "explanation": "Robinson is one of baseball's most famous pioneers."
+      },
+      {
+        "q": "Why is Jackie Robinson important in history?",
+        "choices": [
+          "He broke major racial barriers in pro sports",
+          "He invented a movie camera",
+          "He wrote symphonies",
+          "He discovered electricity"
+        ],
+        "answer": 0,
+        "explanation": "He broke major racial barriers in professional sports."
+      },
+      {
+        "q": "Lessons on Jackie Robinson often focus on what?",
+        "choices": [
+          "Courage and perseverance",
+          "Only weather",
+          "Cooking techniques",
+          "Mountain climbing"
+        ],
+        "answer": 0,
+        "explanation": "His story highlights courage and perseverance."
+      },
+      {
+        "q": "Robinson's legacy reaches beyond sports because of what?",
+        "choices": [
+          "His social and historical impact",
+          "His shoe designs",
+          "His cooking show",
+          "His spaceship plans"
+        ],
+        "answer": 0,
+        "explanation": "His impact goes far beyond athletics."
+      },
+      {
+        "q": "Why is Robinson called a sport icon?",
+        "choices": [
+          "He changed the meaning of representation in sports",
+          "He built stadiums by hand",
+          "He created boxing gloves",
+          "He coached every team"
+        ],
+        "answer": 0,
+        "explanation": "He changed representation in sports history."
+      }
+    ]
+  },
+  {
+    "title": "Serena Williams",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "Tennis champion celebrated for excellence, dominance, and lasting influence.",
+    "keywords": [
+      "sports",
+      "tennis",
+      "champion",
+      "excellence"
+    ],
+    "quiz": [
+      {
+        "q": "Serena Williams is best known for which sport?",
+        "choices": [
+          "Tennis",
+          "Soccer",
+          "Golf",
+          "Track cycling"
+        ],
+        "answer": 0,
+        "explanation": "She is one of the most famous tennis champions ever."
+      },
+      {
+        "q": "Why is Serena Williams often included in sport icon lessons?",
+        "choices": [
+          "She represents excellence and influence",
+          "She discovered the moon",
+          "She built race cars",
+          "She made cartoons"
+        ],
+        "answer": 0,
+        "explanation": "She represents excellence and major influence in sports."
+      },
+      {
+        "q": "A lesson about Serena often highlights what?",
+        "choices": [
+          "Discipline and achievement",
+          "Only weather maps",
+          "Carpentry",
+          "Ocean fishing"
+        ],
+        "answer": 0,
+        "explanation": "Her career reflects discipline and achievement."
+      },
+      {
+        "q": "Serena's influence reaches beyond sports because of what?",
+        "choices": [
+          "Representation and cultural impact",
+          "Her volcano research",
+          "Her bridge designs",
+          "Her cooking school"
+        ],
+        "answer": 0,
+        "explanation": "Her impact includes representation and culture."
+      },
+      {
+        "q": "Why is Serena Williams considered a lasting icon?",
+        "choices": [
+          "Her success changed expectations in her sport",
+          "She invented tennis balls",
+          "She made every racket",
+          "She created clouds"
+        ],
+        "answer": 0,
+        "explanation": "Her success changed expectations in tennis."
+      }
+    ]
+  }
+]

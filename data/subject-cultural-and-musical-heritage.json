@@ -1,4 +1,142 @@
-{
-  "subject": "Cultural & Musical Heritage",
-  "items": []
-}
+[
+  {
+    "title": "Jazz Heritage",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "A cultural lesson on the roots, creativity, and influence of jazz.",
+    "keywords": [
+      "jazz",
+      "music",
+      "culture",
+      "heritage"
+    ],
+    "quiz": [
+      {
+        "q": "Jazz is most closely connected to what?",
+        "choices": [
+          "Musical creativity and improvisation",
+          "Bricklaying",
+          "Rocket fuel",
+          "Farm mapping"
+        ],
+        "answer": 0,
+        "explanation": "Jazz is known for creativity and improvisation."
+      },
+      {
+        "q": "Why is jazz included in cultural heritage lessons?",
+        "choices": [
+          "It shaped music and culture deeply",
+          "It replaced all books",
+          "It invented traffic lights",
+          "It is only a dance move"
+        ],
+        "answer": 0,
+        "explanation": "Jazz had a deep impact on music and culture."
+      },
+      {
+        "q": "A key feature of jazz is what?",
+        "choices": [
+          "Improvisation",
+          "Silent reading",
+          "Snowboarding",
+          "Car repair"
+        ],
+        "answer": 0,
+        "explanation": "Improvisation is a defining part of jazz."
+      },
+      {
+        "q": "Jazz helps students learn about what?",
+        "choices": [
+          "Art, history, and cultural expression",
+          "Only math equations",
+          "Ocean tides",
+          "Bowling scores"
+        ],
+        "answer": 0,
+        "explanation": "Jazz connects art, history, and culture."
+      },
+      {
+        "q": "Why is jazz called heritage?",
+        "choices": [
+          "It carries an important cultural legacy",
+          "It is always ancient",
+          "It belongs only to one city",
+          "It is a type of machine"
+        ],
+        "answer": 0,
+        "explanation": "It represents an important cultural legacy."
+      }
+    ]
+  },
+  {
+    "title": "Hip-Hop Heritage",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "A lesson on creativity, storytelling, rhythm, and cultural influence in hip-hop.",
+    "keywords": [
+      "hip-hop",
+      "music",
+      "culture",
+      "storytelling"
+    ],
+    "quiz": [
+      {
+        "q": "Hip-hop is often studied as what?",
+        "choices": [
+          "A cultural movement and music form",
+          "A weather pattern",
+          "A board game",
+          "A species of bird"
+        ],
+        "answer": 0,
+        "explanation": "Hip-hop is much more than music; it is a cultural movement."
+      },
+      {
+        "q": "Why is hip-hop included in heritage lessons?",
+        "choices": [
+          "It shaped language, style, art, and storytelling",
+          "It teaches plumbing",
+          "It started hockey",
+          "It built pyramids"
+        ],
+        "answer": 0,
+        "explanation": "Hip-hop influenced many parts of culture."
+      },
+      {
+        "q": "A central strength of hip-hop is what?",
+        "choices": [
+          "Storytelling and expression",
+          "Silent marching",
+          "Snow prediction",
+          "Rocket building only"
+        ],
+        "answer": 0,
+        "explanation": "Hip-hop is strongly tied to storytelling and expression."
+      },
+      {
+        "q": "What can students learn from hip-hop heritage?",
+        "choices": [
+          "How culture influences identity and voice",
+          "Only bus schedules",
+          "How clouds are made",
+          "How to weld metal"
+        ],
+        "answer": 0,
+        "explanation": "It helps students see how culture shapes identity and voice."
+      },
+      {
+        "q": "Why does hip-hop matter in education?",
+        "choices": [
+          "It connects art, history, and lived experience",
+          "It replaces all reading",
+          "It is only entertainment",
+          "It is a sport only"
+        ],
+        "answer": 0,
+        "explanation": "Hip-hop can connect art, history, and lived experience."
+      }
+    ]
+  }
+]

@@ -1,4 +1,142 @@
-{
-  "subject": "Civil Rights & Milestone Moments",
-  "items": []
-}
+[
+  {
+    "title": "March on Washington",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "A milestone civil rights moment remembered for unity, advocacy, and speeches.",
+    "keywords": [
+      "civil rights",
+      "march",
+      "washington",
+      "milestone"
+    ],
+    "quiz": [
+      {
+        "q": "The March on Washington is remembered as what?",
+        "choices": [
+          "A major civil rights gathering",
+          "A baseball tournament",
+          "A weather event",
+          "A train schedule"
+        ],
+        "answer": 0,
+        "explanation": "It was a major civil rights gathering."
+      },
+      {
+        "q": "Why is this event often studied?",
+        "choices": [
+          "It showed organized advocacy for equality",
+          "It was a cooking festival",
+          "It launched a cartoon",
+          "It discovered fossils"
+        ],
+        "answer": 0,
+        "explanation": "It represented collective advocacy for equality."
+      },
+      {
+        "q": "The event is strongly linked to what kind of action?",
+        "choices": [
+          "Peaceful protest",
+          "Treasure hunting",
+          "Space travel",
+          "Auto racing"
+        ],
+        "answer": 0,
+        "explanation": "It is linked to peaceful protest and civic action."
+      },
+      {
+        "q": "A major lesson from the March on Washington is what?",
+        "choices": [
+          "Collective action can shape history",
+          "Only one person matters",
+          "Maps are unimportant",
+          "Sports solve everything"
+        ],
+        "answer": 0,
+        "explanation": "The event shows the power of collective action."
+      },
+      {
+        "q": "Why do milestone moment lessons include this event?",
+        "choices": [
+          "It helps explain progress in civil rights history",
+          "It teaches plumbing",
+          "It explains volcanoes",
+          "It is only entertainment"
+        ],
+        "answer": 0,
+        "explanation": "It is central to understanding civil rights history."
+      }
+    ]
+  },
+  {
+    "title": "Montgomery Bus Boycott",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "A powerful civil rights campaign that demonstrated organized community action.",
+    "keywords": [
+      "boycott",
+      "civil rights",
+      "montgomery",
+      "community"
+    ],
+    "quiz": [
+      {
+        "q": "The Montgomery Bus Boycott was a what?",
+        "choices": [
+          "Civil rights protest campaign",
+          "Dance competition",
+          "Weather drill",
+          "Movie premiere"
+        ],
+        "answer": 0,
+        "explanation": "It was a civil rights protest campaign."
+      },
+      {
+        "q": "Why is the boycott important?",
+        "choices": [
+          "It showed the power of organized community action",
+          "It invented bus routes",
+          "It started baseball",
+          "It built a museum"
+        ],
+        "answer": 0,
+        "explanation": "It showed the power of collective action."
+      },
+      {
+        "q": "The boycott teaches students about what?",
+        "choices": [
+          "Persistence and civic action",
+          "Only music charts",
+          "Rocket fuel",
+          "Volcano science"
+        ],
+        "answer": 0,
+        "explanation": "It teaches persistence and civic action."
+      },
+      {
+        "q": "A boycott usually means what?",
+        "choices": [
+          "Refusing to support something to demand change",
+          "Building a bridge",
+          "Starting a sport",
+          "Planting a tree"
+        ],
+        "answer": 0,
+        "explanation": "A boycott withdraws support to demand change."
+      },
+      {
+        "q": "Why is this a milestone moment?",
+        "choices": [
+          "It influenced the civil rights movement",
+          "It discovered a planet",
+          "It made a cartoon famous",
+          "It changed ocean currents"
+        ],
+        "answer": 0,
+        "explanation": "It influenced later civil rights action."
+      }
+    ]
+  }
+]

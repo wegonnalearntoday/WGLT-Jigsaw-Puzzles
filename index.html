@@ -325,8 +325,31 @@
     let quizIndex = 0, quizScore = 0, quizAnswered = false, currentQuizOrder = [], totalScoreAcrossLessons = 0, lessonsCompleted = 0, unlockedBadges = [], autoAdvanceTimer = null;
 
     function setStatus(msg){ statusBox.innerHTML = msg }
+
+    const STORAGE_KEY = 'wglt_json_v2_progress';
+
+    function loadSavedProgress(){
+      try{
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if(!raw) return;
+        const data = JSON.parse(raw);
+        totalScoreAcrossLessons = Number(data.totalScoreAcrossLessons || 0);
+        lessonsCompleted = Number(data.lessonsCompleted || 0);
+        unlockedBadges = Array.isArray(data.unlockedBadges) ? data.unlockedBadges : [];
+      }catch(err){}
+    }
+
+    function saveProgress(){
+      try{
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          totalScoreAcrossLessons,
+          lessonsCompleted,
+          unlockedBadges
+        }));
+      }catch(err){}
+    }
     function updateProgressStats(){ scoreStat.textContent=String(totalScoreAcrossLessons); badgeCountStat.textContent=String(unlockedBadges.length); lessonCountStat.textContent=String(lessonsCompleted); badgeShelf.innerHTML=''; unlockedBadges.forEach(name=>{const pill=document.createElement('div'); pill.className='badge-pill'; pill.textContent=name; badgeShelf.appendChild(pill)}) }
-    function awardBadge(name){ if(!unlockedBadges.includes(name)) unlockedBadges.push(name); updateProgressStats() }
+    function awardBadge(name){ if(!unlockedBadges.includes(name)) unlockedBadges.push(name); updateProgressStats(); saveProgress() }
     function showCelebration(title,text,ms=2400,callback=null){ celebrationTitle.textContent=title; celebrationText.innerHTML=text; celebrationOverlay.classList.add('show'); if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); autoAdvanceTimer=setTimeout(()=>{ celebrationOverlay.classList.remove('show'); if(callback) callback() },ms) }
     function shuffleArray(arr){ const copy=arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]] } return copy }
     function currentSubjectMeta(){ return SUBJECT_INDEX[selectedSubjectIndex] || null }
@@ -618,6 +641,7 @@
     function finishQuiz(){
       const quizLength=currentQuizOrder.length||0, pct=quizLength?Math.round((quizScore/quizLength)*100):0; totalScoreAcrossLessons+=quizScore; lessonsCompleted+=1;
       const item=getCurrentItem(), badgeName=pct===100?`${item.title} Mastery Badge`:pct>=70?`${item.title} Scholar Badge`:`${item.title} Explorer Badge`;
+      saveProgress();
       awardBadge(badgeName); resultsBox.classList.add('show'); resultsBox.innerHTML=`<strong>Quiz Complete</strong><br><br>You scored <strong>${quizScore} / ${quizLength}</strong> (${pct}%).<br><br><strong>Badge unlocked:</strong> ${badgeName}<br><br>Next lesson in this subject will load automatically.`;
       nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; updateProgressStats(); setStatus('Quiz complete. Preparing the next lesson...');
       showCelebration('Badge Unlocked 🎉',`You earned <strong>${badgeName}</strong>.<br>Total score so far: <strong>${totalScoreAcrossLessons}</strong><br><br>Loading the next lesson...`,2800,goToNextLesson)
@@ -646,7 +670,7 @@
     searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
     window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; resetLesson(); hintVisible=false; renderPreview(); setStatus('Board resized. Start the lesson again to keep the layout clean.') });
 
-    renderSubjects(); updateProgressStats(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
+    loadSavedProgress(); renderSubjects(); updateProgressStats(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
   </script>
 </body>
 </html>

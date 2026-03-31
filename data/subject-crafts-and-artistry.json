@@ -1,4 +1,142 @@
-{
-  "subject": "Crafts and Artistry",
-  "items": []
-}
+[
+  {
+    "title": "Quiltmaking Traditions",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "A lesson on craft, storytelling, design, and cultural memory through quilts.",
+    "keywords": [
+      "crafts",
+      "quilts",
+      "design",
+      "storytelling"
+    ],
+    "quiz": [
+      {
+        "q": "Quiltmaking can be both a craft and what else?",
+        "choices": [
+          "A way of telling stories",
+          "A race car engine",
+          "A mountain range",
+          "A weather report"
+        ],
+        "answer": 0,
+        "explanation": "Quiltmaking can carry stories and memory."
+      },
+      {
+        "q": "Why are quilts important in artistry lessons?",
+        "choices": [
+          "They combine design, skill, and meaning",
+          "They only store tools",
+          "They are used for rockets",
+          "They make clouds"
+        ],
+        "answer": 0,
+        "explanation": "Quilts combine visual design and cultural meaning."
+      },
+      {
+        "q": "A quilt can help preserve what?",
+        "choices": [
+          "Family and cultural memory",
+          "Only homework",
+          "Bus routes",
+          "Football rules"
+        ],
+        "answer": 0,
+        "explanation": "Quilts can preserve memory and identity."
+      },
+      {
+        "q": "Why do students study quilt traditions?",
+        "choices": [
+          "To see how craft can carry history",
+          "To learn only math",
+          "To replace books",
+          "To design shoes only"
+        ],
+        "answer": 0,
+        "explanation": "Quilt traditions show how craft can carry history."
+      },
+      {
+        "q": "Which word best fits quiltmaking in this category?",
+        "choices": [
+          "Artistry",
+          "Volcanology",
+          "Astrophysics",
+          "Basketball"
+        ],
+        "answer": 0,
+        "explanation": "Quiltmaking fits crafts and artistry."
+      }
+    ]
+  },
+  {
+    "title": "Beadwork and Design",
+    "imageUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "thumbnailUrl": "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png",
+    "videoUrl": "https://video.wixstatic.com/video/80a41b_b483fcea43a54f5983df6f0ba78403ac/480p/mp4/file.mp4",
+    "description": "A lesson on pattern, skill, symbolism, and handmade design traditions.",
+    "keywords": [
+      "crafts",
+      "beadwork",
+      "design",
+      "pattern"
+    ],
+    "quiz": [
+      {
+        "q": "Beadwork is often valued for what?",
+        "choices": [
+          "Pattern, skill, and symbolism",
+          "Rocket launches",
+          "Cloud formation",
+          "Boat engines"
+        ],
+        "answer": 0,
+        "explanation": "Beadwork often includes pattern, skill, and symbolism."
+      },
+      {
+        "q": "Why does beadwork fit artistry lessons?",
+        "choices": [
+          "It combines design with handmade craft",
+          "It is only a sport",
+          "It measures weather",
+          "It maps highways"
+        ],
+        "answer": 0,
+        "explanation": "Beadwork combines design and handcrafted skill."
+      },
+      {
+        "q": "A big idea in beadwork lessons is what?",
+        "choices": [
+          "Details can carry meaning",
+          "Only large objects matter",
+          "Music replaces design",
+          "Nothing handmade lasts"
+        ],
+        "answer": 0,
+        "explanation": "Details and patterns can hold meaning."
+      },
+      {
+        "q": "What can students learn from beadwork?",
+        "choices": [
+          "Craft traditions can be both artistic and cultural",
+          "Only how to count beads",
+          "How to build rockets",
+          "How to train horses"
+        ],
+        "answer": 0,
+        "explanation": "Beadwork shows how craft can be artistic and cultural."
+      },
+      {
+        "q": "Which category best fits beadwork here?",
+        "choices": [
+          "Crafts and Artistry",
+          "Marine science",
+          "Baseball analytics",
+          "Road safety"
+        ],
+        "answer": 0,
+        "explanation": "Beadwork belongs in crafts and artistry."
+      }
+    ]
+  }
+]
