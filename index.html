@@ -689,8 +689,8 @@
       const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0]));
       const mobile = window.matchMedia('(max-width: 1300px)').matches;
 
-      const edgeSingles = singles.filter(isEdgePiece);
-      const innerSingles = singles.filter(p=>!isEdgePiece(p));
+      const edgeSingles = shuffleArray(singles.filter(isEdgePiece));
+      const innerSingles = shuffleArray(singles.filter(p=>!isEdgePiece(p)));
 
       function layoutTray(targetTray, piecesForTray, desktopScale, mobileScale){
         const trayWidth = targetTray.clientWidth || 150;
@@ -742,7 +742,7 @@
       const singles=groups.filter(g=>g.pieceIds.length===1);
       if(!singles.length){ setStatus('All pieces are already connected into larger groups.'); return; }
       organizeLoosePiecesToTrays();
-      setStatus('Loose single pieces were organized into the left and right trays.');
+      setStatus('Loose single pieces were randomly organized into the edge and inner trays.');
     }
 
     function startInlineTransition(){
