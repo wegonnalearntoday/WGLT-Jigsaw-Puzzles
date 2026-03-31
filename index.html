@@ -516,9 +516,38 @@
       const piece=pieceById.get(e.currentTarget.dataset.id); if(!piece) return;
       activeGroup=getGroup(piece.groupId);
       dragMembers=getGroupPieces(activeGroup.id);
+
+      const boardBox = boardShell.getBoundingClientRect();
+      const pointerBoardX = e.clientX - boardBox.left;
+      const pointerBoardY = e.clientY - boardBox.top;
+
+      if (piece.zone === 'tray') {
+        const anchorOffsetX = pieceWidth / 2;
+        const anchorOffsetY = pieceHeight / 2;
+        const dx = pointerBoardX - anchorOffsetX;
+        const dy = pointerBoardY - anchorOffsetY;
+
+        dragMembers.forEach((p, idx) => {
+          const rel = idx === 0 ? {x:0,y:0} : {x: p.x - piece.x, y: p.y - piece.y};
+          p.x = Math.max(0, Math.min(boardRect.width - pieceWidth, dx + rel.x));
+          p.y = Math.max(0, Math.min(boardRect.height - pieceHeight, dy + rel.y));
+          p.zone = 'board';
+          p.el.style.transform = 'scale(1)';
+          piecesLayer.appendChild(p.el);
+          positionPieceElement(p);
+        });
+      }
+
       dragStartPositions=dragMembers.map(p=>({id:p.id,x:p.x,y:p.y,zone:p.zone}));
       dragPointerStartX=e.clientX; dragPointerStartY=e.clientY;
-      dragMembers.forEach((p,idx)=>{ p.el.classList.add('dragging'); p.el.style.zIndex=String(zCounter+idx); p.zone='board'; piecesLayer.appendChild(p.el); });
+
+      dragMembers.forEach((p,idx)=>{
+        p.el.classList.add('dragging');
+        p.el.style.zIndex=String(zCounter+idx);
+        p.zone='board';
+        p.el.style.transform='scale(1)';
+        piecesLayer.appendChild(p.el);
+      });
       zCounter+=dragMembers.length+2;
       e.currentTarget.setPointerCapture(e.pointerId); window.addEventListener('pointermove',onPointerMove); window.addEventListener('pointerup',onPointerUp)
     }
@@ -604,7 +633,7 @@
 
         if(mobile){
           const cols = Math.max(2, Math.floor(targetTray.clientWidth / Math.max(50, pieceWidth * 0.38)));
-          const scale = Math.min(0.42, (targetTray.clientWidth - 12) / (pieceWidth * Math.max(1, cols)));
+          const scale = Math.min(0.48, (targetTray.clientWidth - 12) / (pieceWidth * Math.max(1, cols)));
           const w = pieceWidth * scale;
           const h = pieceHeight * scale;
           const col = Math.floor((idx/2) % cols);
@@ -615,7 +644,7 @@
           piece.el.style.top=`${8 + row * (h + 6)}px`;
         }else{
           const trayWidth = targetTray.clientWidth || 150;
-          const scale = Math.min(0.5, (trayWidth - 20) / pieceWidth);
+          const scale = Math.min(0.58, (trayWidth - 20) / pieceWidth);
           const w = pieceWidth * scale;
           const h = pieceHeight * scale;
           const row = Math.floor(idx/2);
