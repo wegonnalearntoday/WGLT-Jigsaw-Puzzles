@@ -149,7 +149,7 @@
 
         <div class="actions">
           <button class="btn-primary" id="startBtn">Start Lesson Flow</button>
-          <button class="btn-secondary" id="trayBtn">Send Loose Pieces to Trays</button>
+          <button class="btn-secondary" id="trayBtn">Organize Loose Pieces in Trays</button>
           <button class="btn-secondary" id="showSolvedBtn">Show Hint Picture</button>
           <button class="btn-danger" id="resetBtn">Reset Lesson</button>
         </div>
@@ -522,15 +522,12 @@
       const pointerBoardY = e.clientY - boardBox.top;
 
       if (piece.zone === 'tray') {
-        const anchorOffsetX = pieceWidth / 2;
-        const anchorOffsetY = pieceHeight / 2;
-        const dx = pointerBoardX - anchorOffsetX;
-        const dy = pointerBoardY - anchorOffsetY;
+        const startBoardX = Math.max(0, Math.min(boardRect.width - pieceWidth, pointerBoardX - pieceWidth / 2));
+        const startBoardY = Math.max(0, Math.min(boardRect.height - pieceHeight, pointerBoardY - pieceHeight / 2));
 
         dragMembers.forEach((p, idx) => {
-          const rel = idx === 0 ? {x:0,y:0} : {x: p.x - piece.x, y: p.y - piece.y};
-          p.x = Math.max(0, Math.min(boardRect.width - pieceWidth, dx + rel.x));
-          p.y = Math.max(0, Math.min(boardRect.height - pieceHeight, dy + rel.y));
+          p.x = startBoardX;
+          p.y = startBoardY;
           p.zone = 'board';
           p.el.style.transform = 'scale(1)';
           piecesLayer.appendChild(p.el);
@@ -569,9 +566,15 @@
       let mergedAnything=false, didMerge;
       do{ didMerge=tryMergeGroup(activeGroup.id); mergedAnything=mergedAnything||didMerge }while(didMerge&&activeGroup);
       updateStats(); checkCompletion();
-      if(mergedAnything){ const count=getGroup(activeGroup.id).pieceIds.length; setStatus(`Nice! Connected pieces now move together. Group size: ${count}.`) }
-      organizeLoosePiecesToTrays();
-      dragMembers=[]; dragStartPositions=[]; activeGroup=null; window.removeEventListener('pointermove',onPointerMove); window.removeEventListener('pointerup',onPointerUp)
+      if(mergedAnything){
+        const count=getGroup(activeGroup.id).pieceIds.length;
+        setStatus(`Nice! Connected pieces now move together. Group size: ${count}.`);
+      } else {
+        setStatus('Piece placed on the board. Use Organize Loose Pieces in Trays whenever you want to reorganize singles.');
+      }
+      dragMembers=[]; dragStartPositions=[]; activeGroup=null;
+      window.removeEventListener('pointermove',onPointerMove);
+      window.removeEventListener('pointerup',onPointerUp)
     }
 
     function constrainGroupToBoard(groupId){
