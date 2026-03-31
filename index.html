@@ -96,7 +96,16 @@
     }
     @media (max-width:1100px){.layout{grid-template-columns:1fr}.thumb-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.thumb-grid{grid-template-columns:1fr}}
-  </style>
+  
+.tray::-webkit-scrollbar {
+  width: 6px;
+}
+.tray::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.4);
+  border-radius: 6px;
+}
+
+</style>
 </head>
 <body>
   <div class="wrap">
