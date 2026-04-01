@@ -684,8 +684,8 @@ label[for="indexPathInput"]{
 
     function constrainGroupToBoard(groupId){
       const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId);
-      const overflowX = pieceWidth * 0.5;
-      const overflowY = pieceHeight * 0.5;
+      const overflowX = pieceWidth * 0.9;
+      const overflowY = pieceHeight * 0.9;
       let shiftX=0, shiftY=0;
       if(bbox.minX < -overflowX) shiftX = -overflowX - bbox.minX;
       if(bbox.minY < -overflowY) shiftY = -overflowY - bbox.minY;
