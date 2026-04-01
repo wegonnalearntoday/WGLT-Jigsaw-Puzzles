@@ -683,11 +683,14 @@ label[for="indexPathInput"]{
     }
 
     function constrainGroupToBoard(groupId){
-      const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId); let shiftX=0, shiftY=0;
-      if(bbox.minX<0) shiftX=-bbox.minX;
-      if(bbox.minY<0) shiftY=-bbox.minY;
-      if(bbox.maxX>boardRect.width) shiftX=boardRect.width-bbox.maxX;
-      if(bbox.maxY>boardRect.height) shiftY=boardRect.height-bbox.maxY;
+      const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId);
+      const overflowX = pieceWidth * 0.7;
+      const overflowY = pieceHeight * 0.7;
+      let shiftX=0, shiftY=0;
+      if(bbox.minX < -overflowX) shiftX = -overflowX - bbox.minX;
+      if(bbox.minY < -overflowY) shiftY = -overflowY - bbox.minY;
+      if(bbox.maxX > boardRect.width + overflowX) shiftX = (boardRect.width + overflowX) - bbox.maxX;
+      if(bbox.maxY > boardRect.height + overflowY) shiftY = (boardRect.height + overflowY) - bbox.maxY;
       members.forEach(p=>{ p.x+=shiftX; p.y+=shiftY; positionPieceElement(p) })
     }
 
