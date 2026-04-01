@@ -634,12 +634,14 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       const pointerBoardY = e.clientY - boardBox.top;
 
       if (piece.zone === 'tray' || piece.zone === 'parking') {
-        const startBoardX = Math.max(0, Math.min(boardRect.width - pieceWidth, pointerBoardX - pieceWidth / 2));
-        const startBoardY = Math.max(0, Math.min(boardRect.height - pieceHeight, pointerBoardY - pieceHeight / 2));
+        const targetX = Math.max(-pieceWidth * 0.7, Math.min(boardRect.width - pieceWidth * 0.3, pointerBoardX - pieceWidth / 2));
+        const targetY = Math.max(-pieceHeight * 0.7, Math.min(boardRect.height - pieceHeight * 0.3, pointerBoardY - pieceHeight / 2));
+        const shiftX = targetX - piece.x;
+        const shiftY = targetY - piece.y;
 
         dragMembers.forEach((p, idx) => {
-          p.x = startBoardX;
-          p.y = startBoardY;
+          p.x += shiftX;
+          p.y += shiftY;
           p.zone = 'board';
           p.el.style.transform = 'scale(1)';
           piecesLayer.appendChild(p.el);
