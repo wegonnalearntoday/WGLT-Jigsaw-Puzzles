@@ -62,6 +62,14 @@
       display:flex;flex-direction:column;overflow:hidden
     }
     .tray-title{text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px}
+
+.parking-wrap{margin-top:14px}
+.parking-zone{
+  background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.22);border-radius:18px;
+  padding:10px;min-height:170px;max-height:220px;overflow:auto;position:relative
+}
+.parking-title{text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px}
+.parking-note{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
     .tray-box{
       position:relative;flex:1;overflow-y:auto;overflow-x:hidden;border-radius:16px;background:rgba(255,255,255,.02);
       scrollbar-width:thin;padding-right:4px
@@ -150,6 +158,7 @@
     @media (max-width: 900px){
       .thumb-card{min-height:140px}
       .tray-box{min-height:180px}
+      .parking-zone{min-height:150px;max-height:190px}
     }
 
 
@@ -213,6 +222,7 @@ label[for="indexPathInput"]{
         <div class="actions">
           <button class="btn-primary" id="startBtn">Start Lesson Flow</button>
           <button class="btn-secondary" id="trayBtn">Organize Loose Pieces in Trays</button>
+          <button class="btn-secondary" id="parkBtn">Park Connected Groups</button>
           <button class="btn-secondary" id="showSolvedBtn">Show Hint Picture</button>
           <button class="btn-danger" id="resetBtn">Reset Lesson</button>
         </div>
@@ -238,8 +248,8 @@ label[for="indexPathInput"]{
         <div class="tiny-code">
           <strong>Tray system:</strong><br>
           Loose single pieces get organized into left and right trays.<br>
-          Connected groups stay on the main board.<br>
-          This works much better for larger puzzle sizes than forcing edge parking inside the board.
+Connected groups can also be sent to the parking zone shelf below the board.<br>
+          This works much better for larger puzzle sizes than forcing every chunk to stay on the main board.
         </div>
       </aside>
 
@@ -274,6 +284,12 @@ label[for="indexPathInput"]{
             <div class="tray-title">Inner Pieces Tray</div>
             <div id="rightTray" class="tray-box"></div>
           </div>
+        </div>
+
+        <div class="parking-wrap">
+          <div class="parking-title">Connected Piece Parking Zone</div>
+          <div id="parkingZone" class="parking-zone"></div>
+          <div class="parking-note">Use Park Connected Groups to move assembled chunks out of the way, then drag them back onto the board whenever you need them.</div>
         </div>
 
         <p class="hint">Hint stays hidden until the button is pressed. Finish the puzzle, the board turns into the video, then the quiz appears below.</p>
@@ -329,6 +345,7 @@ label[for="indexPathInput"]{
     const difficulty = document.getElementById('difficulty');
     const startBtn = document.getElementById('startBtn');
     const trayBtn = document.getElementById('trayBtn');
+    const parkBtn = document.getElementById('parkBtn');
     const showSolvedBtn = document.getElementById('showSolvedBtn');
     const resetBtn = document.getElementById('resetBtn');
     const previewBox = document.getElementById('previewBox');
@@ -342,6 +359,7 @@ label[for="indexPathInput"]{
     const inlineVideo = document.getElementById('inlineVideo');
     const leftTray = document.getElementById('leftTray');
     const rightTray = document.getElementById('rightTray');
+    const parkingZone = document.getElementById('parkingZone');
     const movesStat = document.getElementById('movesStat');
     const connectedStat = document.getElementById('connectedStat');
     const totalStat = document.getElementById('totalStat');
@@ -615,7 +633,7 @@ label[for="indexPathInput"]{
       const pointerBoardX = e.clientX - boardBox.left;
       const pointerBoardY = e.clientY - boardBox.top;
 
-      if (piece.zone === 'tray') {
+      if (piece.zone === 'tray' || piece.zone === 'parking') {
         const startBoardX = Math.max(0, Math.min(boardRect.width - pieceWidth, pointerBoardX - pieceWidth / 2));
         const startBoardY = Math.max(0, Math.min(boardRect.height - pieceHeight, pointerBoardY - pieceHeight / 2));
 
@@ -675,7 +693,7 @@ label[for="indexPathInput"]{
         const count=getGroup(activeGroup.id).pieceIds.length;
         setStatus(`Nice! Connected pieces now move together. Group size: ${count}.`);
       } else {
-        setStatus('Piece placed on the board. Use Organize Loose Pieces in Trays whenever you want to reorganize singles.');
+        setStatus('Piece placed on the board. Use the trays for singles and the parking zone for connected chunks whenever you want to clear space.');
       }
       dragMembers=[]; dragStartPositions=[]; activeGroup=null;
       window.removeEventListener('pointermove',onPointerMove);
@@ -684,8 +702,8 @@ label[for="indexPathInput"]{
 
     function constrainGroupToBoard(groupId){
       const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId);
-      const overflowX = pieceWidth * 0.9;
-      const overflowY = pieceHeight * 0.9;
+      const overflowX = pieceWidth * 0.7;
+      const overflowY = pieceHeight * 0.7;
       let shiftX=0, shiftY=0;
       if(bbox.minX < -overflowX) shiftX = -overflowX - bbox.minX;
       if(bbox.minY < -overflowY) shiftY = -overflowY - bbox.minY;
@@ -731,6 +749,7 @@ label[for="indexPathInput"]{
 
     function organizeLoosePiecesToTrays(){
       leftTray.innerHTML=''; rightTray.innerHTML='';
+      parkingZone.innerHTML='';
       const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0]));
       const mobile = window.matchMedia('(max-width: 1300px)').matches;
 
@@ -771,7 +790,7 @@ label[for="indexPathInput"]{
       layoutTray(leftTray, edgeSingles, 0.58, 0.48);
       layoutTray(rightTray, innerSingles, 0.58, 0.48);
 
-      groups.filter(g=>g.pieceIds.length>1).forEach(g=>{
+      groups.filter(g=>g.pieceIds.length>1 && !getGroupPieces(g.id).every(p=>p.zone==='parking')).forEach(g=>{
         getGroupPieces(g.id).forEach(p=>{
           p.zone='board';
           p.el.style.transform='scale(1)';
@@ -781,6 +800,69 @@ label[for="indexPathInput"]{
         });
       });
     }
+
+
+function layoutConnectedGroupsInParking(){
+  parkingZone.innerHTML='';
+  const parkedGroups = groups.filter(g=>g.pieceIds.length>1);
+  if(!parkedGroups.length) return;
+
+  const mobile = window.matchMedia('(max-width: 1300px)').matches;
+  const scale = mobile ? 0.64 : 0.76;
+  const gap = 12;
+  const zoneWidth = parkingZone.clientWidth || 640;
+  const spacer = document.createElement('div');
+  spacer.style.position = 'relative';
+  spacer.style.width = '100%';
+  spacer.style.minHeight = '140px';
+  parkingZone.appendChild(spacer);
+
+  let cursorX = 10;
+  let cursorY = 10;
+  let rowHeight = 0;
+
+  parkedGroups.forEach(group=>{
+    const members = getGroupPieces(group.id);
+    const bbox = getGroupBounds(group.id);
+    const groupWidth = Math.max(48, bbox.width * scale);
+    const groupHeight = Math.max(48, bbox.height * scale);
+
+    if(cursorX + groupWidth + 10 > zoneWidth){
+      cursorX = 10;
+      cursorY += rowHeight + gap;
+      rowHeight = 0;
+    }
+
+    members.forEach(piece=>{
+      const relX = (piece.x - bbox.minX) * scale;
+      const relY = (piece.y - bbox.minY) * scale;
+      spacer.appendChild(piece.el);
+      piece.zone='parking';
+      piece.el.classList.add('tray-piece');
+      piece.el.style.transformOrigin='top left';
+      piece.el.style.transform=`scale(${scale})`;
+      piece.el.style.left=`${cursorX + relX}px`;
+      piece.el.style.top=`${cursorY + relY}px`;
+      piece.el.style.zIndex=String(zCounter++);
+    });
+
+    cursorX += groupWidth + gap;
+    rowHeight = Math.max(rowHeight, groupHeight);
+  });
+
+  spacer.style.height = `${cursorY + rowHeight + 14}px`;
+}
+
+function parkConnectedGroups(){
+  if(!pieces.length) return;
+  const connectedGroups = groups.filter(g=>g.pieceIds.length>1);
+  if(!connectedGroups.length){
+    setStatus('No connected groups to park yet. Snap a few pieces together first.');
+    return;
+  }
+  layoutConnectedGroupsInParking();
+  setStatus('Connected groups were sent to the parking zone. Drag any parked chunk back onto the board whenever you need it.');
+}
 
     function sendLoosePiecesToTrays(){
       if(!pieces.length) return;
@@ -847,6 +929,7 @@ label[for="indexPathInput"]{
 
     startBtn.addEventListener('click',startLessonFlow);
     trayBtn.addEventListener('click',sendLoosePiecesToTrays);
+    parkBtn.addEventListener('click',parkConnectedGroups);
     showSolvedBtn.addEventListener('click',()=>{ hintVisible=true; renderPreview(); setStatus('Hint picture shown.') });
     resetBtn.addEventListener('click',()=>{ resetLesson(); hintVisible=false; renderPreview(); setStatus('Lesson reset. Choose a size and start again.') });
     nextQuestionBtn.addEventListener('click',()=>{ quizIndex++; renderQuizQuestion() });
