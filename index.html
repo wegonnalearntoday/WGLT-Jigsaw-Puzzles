@@ -124,7 +124,7 @@
     .tray-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.35);border-radius:8px}
     .ghost-outline{
       position:absolute;pointer-events:none;z-index:3;border:2px dashed rgba(244,180,0,.85);
-      background:rgba(244,180,0,.12);display:none;border-radius:10px;
+      background:rgba(244,180,0,.12);display:none;opacity:0;border-radius:10px;
       box-shadow:0 0 18px rgba(244,180,0,.22) inset;
     }
 
@@ -528,16 +528,26 @@ label[for="indexPathInput"]{
     }
 
     function showGhostForPiece(piece){
-      if(!(size>=2 && size<=4)){ ghostOutline.style.display='none'; return; }
-      ghostOutline.style.display='block';
+      if(!(size>=2 && size<=4)){
+        ghostOutline.style.opacity='0';
+        ghostOutline.style.display='none';
+        return;
+      }
       ghostOutline.style.left = `${piece.col * pieceWidth}px`;
       ghostOutline.style.top = `${piece.row * pieceHeight}px`;
       ghostOutline.style.width = `${pieceWidth}px`;
       ghostOutline.style.height = `${pieceHeight}px`;
+      ghostOutline.style.opacity='1';
+      ghostOutline.style.display='block';
     }
 
     function hideGhost(){
+      ghostOutline.style.opacity='0';
       ghostOutline.style.display='none';
+      ghostOutline.style.left='-9999px';
+      ghostOutline.style.top='-9999px';
+      ghostOutline.style.width='0px';
+      ghostOutline.style.height='0px';
     }
 
     function updateBoardMetrics(){ boardRect=boardShell.getBoundingClientRect(); pieceWidth=boardRect.width/size; pieceHeight=boardRect.height/size }
@@ -784,7 +794,13 @@ label[for="indexPathInput"]{
       setTimeout(()=>{ inlineVideo.play().catch(()=>{ setStatus('Tap play on the video to continue.') }) },250)
     }
 
-    function checkCompletion(){ if(groups.length===1&&groups[0].pieceIds.length===size*size){ puzzleStarted=false; startInlineTransition() } }
+    function checkCompletion(){
+      if(groups.length===1&&groups[0].pieceIds.length===size*size){
+        puzzleStarted=false;
+        hideGhost();
+        startInlineTransition();
+      }
+    }
 
     function showQuiz(){
       const item = getCurrentItem(); if (!item) return;
@@ -832,6 +848,7 @@ label[for="indexPathInput"]{
     resetBtn.addEventListener('click',()=>{ resetLesson(); hintVisible=false; renderPreview(); setStatus('Lesson reset. Choose a size and start again.') });
     nextQuestionBtn.addEventListener('click',()=>{ quizIndex++; renderQuizQuestion() });
     finishQuizBtn.addEventListener('click',finishQuiz);
+    inlineVideo.addEventListener('play',()=>{ hideGhost(); });
     inlineVideo.addEventListener('ended',showQuiz);
     reloadIndexBtn.addEventListener('click',()=>loadIndex(indexPathInput.value.trim()||'data/subjects-index.json'));
     searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
