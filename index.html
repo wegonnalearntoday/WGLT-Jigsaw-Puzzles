@@ -309,7 +309,7 @@ label[for="indexPathInput"]{
     const FALLBACK_INDEX = {
       subjects: [
         { subject: "Black Historical Figures & Leaders", file: "data/subject-black-historical-figures.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Movies", file: "data/subject-movies.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
+        { subject: "Movies & TV Shows", file: "data/subject-movies.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
         { subject: "Art by Black Artists", file: "data/subject-art-by-black-artists.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
         { subject: "Civil Rights & Milestone Moments", file: "data/subject-civil-rights-and-milestone-moments.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
         { subject: "Sport Icons", file: "data/subject-sport-icons.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
@@ -684,8 +684,8 @@ label[for="indexPathInput"]{
 
     function constrainGroupToBoard(groupId){
       const members=getGroupPieces(groupId), bbox=getGroupBounds(groupId);
-      const overflowX = pieceWidth * 0.7;
-      const overflowY = pieceHeight * 0.7;
+      const overflowX = pieceWidth * 0.5;
+      const overflowY = pieceHeight * 0.5;
       let shiftX=0, shiftY=0;
       if(bbox.minX < -overflowX) shiftX = -overflowX - bbox.minX;
       if(bbox.minY < -overflowY) shiftY = -overflowY - bbox.minY;
