@@ -153,11 +153,12 @@
     }
 
 
-    #indexPathInput,
-    #reloadIndexBtn,
-    label[for="indexPathInput"]{
-      display:none !important;
-    }
+#indexPathInput,
+#reloadIndexBtn,
+label[for="indexPathInput"]{
+  display:none !important;
+}
+
 </style>
 </head>
 <body>
@@ -171,7 +172,16 @@
       <aside class="panel">
         <h2>Choose Your Lesson</h2>
 
-        <div id="loaderBox" class="loader" style="display:none;">Loading lesson library…</div>
+        <div class="field">
+          <label for="indexPathInput">Subject index JSON path</label>
+          <div class="json-row">
+            <input id="indexPathInput" value="data/subjects-index.json" />
+            <button id="reloadIndexBtn" class="btn-secondary" style="width:auto;">Load</button>
+          </div>
+          <div class="tiny-note">This loads a small subject index, then each subject file loads only when needed.</div>
+        </div>
+
+        <div id="loaderBox" class="loader">Loading lesson library…</div>
 
         <div class="field">
           <label>Subject</label>
@@ -769,7 +779,6 @@
 
     function startInlineTransition(){
       const item = getCurrentItem(); if (!item) return;
-      hideGhost();
       setStatus('Puzzle complete! The image is coming alive...'); boardShell.classList.add('flash'); setTimeout(()=>boardShell.classList.remove('flash'),700);
       inlineVideo.src=item.videoUrl; inlineVideo.load(); piecesLayer.style.opacity='0'; piecesLayer.style.transform='scale(1.03)'; inlineVideo.style.opacity='1';
       setTimeout(()=>{ inlineVideo.play().catch(()=>{ setStatus('Tap play on the video to continue.') }) },250)
@@ -779,7 +788,6 @@
 
     function showQuiz(){
       const item = getCurrentItem(); if (!item) return;
-      hideGhost();
       quizShell.classList.add('show'); currentQuizOrder = shuffleArray((item.quiz||[]).map(q=>({q:q.q,choices:q.choices.slice(),answer:q.answer,explanation:q.explanation,_shuffledChoices:[]})));
       quizIndex=0; quizScore=0; quizAnswered=false; resultsBox.classList.remove('show'); resultsBox.innerHTML=''; renderQuizQuestion(); quizShell.scrollIntoView({behavior:'smooth',block:'start'}); setStatus('Video finished. Now answer the quiz to continue.')
     }
@@ -814,12 +822,12 @@
     }
 
     function resetBoardOnly(){ piecesLayer.innerHTML=''; boardGrid.innerHTML=''; leftTray.innerHTML=''; rightTray.innerHTML=''; pieces=[]; groups=[]; pieceById=new Map(); groupById=new Map(); moves=0; puzzleStarted=false; activeGroup=null; dragMembers=[]; dragStartPositions=[]; updateStats() }
-    function resetLesson(){ if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); celebrationOverlay.classList.remove('show'); hideGhost(); resetBoardOnly(); inlineVideo.pause(); inlineVideo.removeAttribute('src'); inlineVideo.load(); inlineVideo.style.opacity='0'; piecesLayer.style.opacity='1'; piecesLayer.style.transform='scale(1)'; quizShell.classList.remove('show'); resultsBox.classList.remove('show'); resultsBox.innerHTML=''; nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; quizIndex=0; quizScore=0; quizAnswered=false; currentQuizOrder=[]; updateProgressStats() }
-    function autoStartCurrentLesson(){ size=Number(difficulty.value); resetLesson(); hideGhost(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Next lesson loaded automatically. Drag pieces into place to begin.') }
+    function resetLesson(){ if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); celebrationOverlay.classList.remove('show'); resetBoardOnly(); inlineVideo.pause(); inlineVideo.removeAttribute('src'); inlineVideo.load(); inlineVideo.style.opacity='0'; piecesLayer.style.opacity='1'; piecesLayer.style.transform='scale(1)'; quizShell.classList.remove('show'); resultsBox.classList.remove('show'); resultsBox.innerHTML=''; nextQuestionBtn.style.display='none'; finishQuizBtn.style.display='none'; quizIndex=0; quizScore=0; quizAnswered=false; currentQuizOrder=[]; updateProgressStats() }
+    function autoStartCurrentLesson(){ size=Number(difficulty.value); resetLesson(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Next lesson loaded automatically. Drag pieces into place to begin.') }
     function startLessonFlow(){ if(!getCurrentItem()){ setStatus('Please choose a lesson first.'); return } size=Number(difficulty.value); resetLesson(); refreshHeader(); buildGrid(); buildPieces(); puzzleStarted=true; setStatus('Drag pieces into place. Matching neighbors snap together and move as one group.') }
 
     startBtn.addEventListener('click',startLessonFlow);
-    trayBtn.addEventListener('click',()=>{ hideGhost(); sendLoosePiecesToTrays(); });
+    trayBtn.addEventListener('click',sendLoosePiecesToTrays);
     showSolvedBtn.addEventListener('click',()=>{ hintVisible=true; renderPreview(); setStatus('Hint picture shown.') });
     resetBtn.addEventListener('click',()=>{ resetLesson(); hintVisible=false; renderPreview(); setStatus('Lesson reset. Choose a size and start again.') });
     nextQuestionBtn.addEventListener('click',()=>{ quizIndex++; renderQuizQuestion() });
