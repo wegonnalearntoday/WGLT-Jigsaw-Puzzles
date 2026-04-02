@@ -66,14 +66,18 @@
 .parking-wrap{margin-top:14px}
 .parking-zone{
   background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.22);border-radius:18px;
-  padding:10px;min-height:170px;max-height:220px;overflow:auto;position:relative
+  padding:10px;min-height:170px;max-height:220px;overflow:auto;position:relative;
+  -webkit-overflow-scrolling:touch; scrollbar-width:thin; scrollbar-color:rgba(244,180,0,.75) rgba(255,255,255,.08)
 }
 .parking-title{text-align:center;color:var(--muted);font-size:13px;margin-bottom:8px}
 .parking-note{text-align:center;color:var(--muted);font-size:12px;margin-top:8px}
     .tray-box{
       position:relative;flex:1;overflow-y:auto;overflow-x:hidden;border-radius:16px;background:rgba(255,255,255,.02);
-      scrollbar-width:thin;padding-right:4px
+      -webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(244,180,0,.75) rgba(255,255,255,.08);padding-right:4px
     }
+    .tray-box::-webkit-scrollbar,.parking-zone::-webkit-scrollbar{width:12px;height:12px}
+    .tray-box::-webkit-scrollbar-track,.parking-zone::-webkit-scrollbar-track{background:rgba(255,255,255,.08);border-radius:999px}
+    .tray-box::-webkit-scrollbar-thumb,.parking-zone::-webkit-scrollbar-thumb{background:rgba(244,180,0,.75);border-radius:999px;border:2px solid rgba(255,255,255,.08)}
     .board-shell{position:relative;width:min(100%,var(--solveSize));aspect-ratio:1/1;margin:0 auto;background:radial-gradient(circle at center,rgba(255,255,255,.075),rgba(255,255,255,.03));border-radius:24px;border:2px solid rgba(255,255,255,.08);overflow:hidden}
     .board-grid{position:absolute;inset:0;display:grid;pointer-events:none;z-index:1}
     .grid-cell{border:1px dashed rgba(255,255,255,.12)}
@@ -113,8 +117,11 @@
     }
       .tray-box{
       position:relative;flex:1;overflow-y:auto;overflow-x:hidden;border-radius:16px;background:rgba(255,255,255,.02);
-      scrollbar-width:thin;padding-right:4px
+      -webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:rgba(244,180,0,.75) rgba(255,255,255,.08);padding-right:4px
     }
+    .tray-box::-webkit-scrollbar,.parking-zone::-webkit-scrollbar{width:12px;height:12px}
+    .tray-box::-webkit-scrollbar-track,.parking-zone::-webkit-scrollbar-track{background:rgba(255,255,255,.08);border-radius:999px}
+    .tray-box::-webkit-scrollbar-thumb,.parking-zone::-webkit-scrollbar-thumb{background:rgba(244,180,0,.75);border-radius:999px;border:2px solid rgba(255,255,255,.08)}
     }
     @media (max-width:1100px){.layout{grid-template-columns:1fr}.thumb-grid{grid-template-columns:repeat(2,1fr)}}
     @media (max-width:680px){.thumb-grid{grid-template-columns:1fr}}
@@ -699,7 +706,8 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       }
       dragMembers=[]; dragStartPositions=[]; activeGroup=null;
       window.removeEventListener('pointermove',onPointerMove);
-      window.removeEventListener('pointerup',onPointerUp)
+      window.removeEventListener('pointerup',onPointerUp);
+      window.removeEventListener('pointercancel',onPointerUp)
     }
 
     function constrainGroupToBoard(groupId){
@@ -749,48 +757,49 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       });
     }
 
-    function organizeLoosePiecesToTrays(){
-      leftTray.innerHTML=''; rightTray.innerHTML='';
-      parkingZone.innerHTML='';
-      const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0]));
+    
+function layoutTrayPieces(targetTray, piecesForTray, desktopScale, mobileScale){
       const mobile = window.matchMedia('(max-width: 1300px)').matches;
+      const trayWidth = targetTray.clientWidth || 150;
+      const columns = mobile ? Math.max(2, Math.floor((trayWidth-12) / Math.max(36, pieceWidth*mobileScale))) : 1;
+      const gap = 8;
+      const scale = mobile ? Math.max(mobileScale, 0.56) : Math.max(desktopScale, 0.62);
+      const itemW = pieceWidth * scale;
+      const itemH = pieceHeight * scale;
+      const neededRows = Math.max(1, Math.ceil(Math.max(1,piecesForTray.length) / columns));
+      const virtualHeight = 8 + neededRows * (itemH + gap) + 12;
+      const spacer = document.createElement('div');
+      spacer.style.position = 'relative';
+      spacer.style.width = '100%';
+      spacer.style.height = `${virtualHeight}px`;
+      targetTray.innerHTML='';
+      targetTray.appendChild(spacer);
 
-      const edgeSingles = shuffleArray(singles.filter(isEdgePiece));
-      const innerSingles = shuffleArray(singles.filter(p=>!isEdgePiece(p)));
+      piecesForTray.forEach((piece, idx)=>{
+        spacer.appendChild(piece.el);
+        piece.zone='tray';
+        piece.el.classList.add('tray-piece');
+        piece.el.style.transformOrigin='top left';
+        piece.el.style.transform=`scale(${scale})`;
+        const col = mobile ? idx % columns : 0;
+        const row = mobile ? Math.floor(idx / columns) : idx;
+        const left = mobile ? 8 + col * (itemW + gap) : Math.max(6, (trayWidth - itemW) / 2);
+        const top = 8 + row * (itemH + gap);
+        piece.el.style.left=`${left}px`;
+        piece.el.style.top=`${top}px`;
+        piece.el.style.zIndex=String(zCounter++);
+      });
+    }
 
-      function layoutTray(targetTray, piecesForTray, desktopScale, mobileScale){
-        const trayWidth = targetTray.clientWidth || 150;
-        const columns = mobile ? Math.max(2, Math.floor((trayWidth-12) / Math.max(36, pieceWidth*mobileScale))) : 1;
-        const gap = 8;
-        const scale = mobile ? Math.max(mobileScale, 0.56) : Math.max(desktopScale, 0.62);
-        const itemW = pieceWidth * scale;
-        const itemH = pieceHeight * scale;
-        const neededRows = Math.max(1, Math.ceil(piecesForTray.length / columns));
-        const virtualHeight = 8 + neededRows * (itemH + gap) + 12;
-        const spacer = document.createElement('div');
-        spacer.style.position = 'relative';
-        spacer.style.width = '100%';
-        spacer.style.height = `${virtualHeight}px`;
-        targetTray.appendChild(spacer);
+    function organizeLoosePiecesToTrays(forceAllLooseToTrays=true){
+      const singles=groups.filter(g=>g.pieceIds.length===1).map(g=>pieceById.get(g.pieceIds[0]));
+      const traySingles = forceAllLooseToTrays ? singles : singles.filter(p=>p.zone==='tray');
 
-        piecesForTray.forEach((piece, idx)=>{
-          spacer.appendChild(piece.el);
-          piece.zone='tray';
-          piece.el.classList.add('tray-piece');
-          piece.el.style.transformOrigin='top left';
-          piece.el.style.transform=`scale(${scale})`;
-          const col = mobile ? idx % columns : 0;
-          const row = mobile ? Math.floor(idx / columns) : idx;
-          const left = mobile ? 8 + col * (itemW + gap) : Math.max(6, (trayWidth - itemW) / 2);
-          const top = 8 + row * (itemH + gap);
-          piece.el.style.left=`${left}px`;
-          piece.el.style.top=`${top}px`;
-          piece.el.style.zIndex=String(zCounter++);
-        });
-      }
+      const edgeSingles = shuffleArray(traySingles.filter(isEdgePiece));
+      const innerSingles = shuffleArray(traySingles.filter(p=>!isEdgePiece(p)));
 
-      layoutTray(leftTray, edgeSingles, 0.58, 0.48);
-      layoutTray(rightTray, innerSingles, 0.58, 0.48);
+      layoutTrayPieces(leftTray, edgeSingles, 0.58, 0.48);
+      layoutTrayPieces(rightTray, innerSingles, 0.58, 0.48);
 
       groups.filter(g=>g.pieceIds.length>1 && !getGroupPieces(g.id).every(p=>p.zone==='parking')).forEach(g=>{
         getGroupPieces(g.id).forEach(p=>{
@@ -801,6 +810,16 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
           positionPieceElement(p);
         });
       });
+
+      if(!forceAllLooseToTrays){
+        singles.filter(p=>p.zone==='board').forEach(p=>{
+          p.el.classList.remove('tray-piece');
+          p.el.style.transform='scale(1)';
+          p.el.style.transformOrigin='top left';
+          piecesLayer.appendChild(p.el);
+          positionPieceElement(p);
+        });
+      }
     }
 
 
@@ -940,7 +959,16 @@ function parkConnectedGroups(){
     inlineVideo.addEventListener('ended',showQuiz);
     reloadIndexBtn.addEventListener('click',()=>loadIndex(indexPathInput.value.trim()||'data/subjects-index.json'));
     searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
-    window.addEventListener('resize',()=>{ if(!puzzleStarted&&!pieces.length) return; organizeLoosePiecesToTrays(); hideGhost(); });
+    let mobileResizeTimer=null;
+    window.addEventListener('resize',()=>{
+      if(!puzzleStarted&&!pieces.length) return;
+      clearTimeout(mobileResizeTimer);
+      mobileResizeTimer=setTimeout(()=>{
+        organizeLoosePiecesToTrays(false);
+        if(groups.some(g=>getGroupPieces(g.id).every(p=>p.zone==='parking'))) layoutConnectedGroupsInParking();
+        hideGhost();
+      }, 180);
+    });
 
     loadSavedProgress(); updateProgressStats(); renderSubjects(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
   </script>
