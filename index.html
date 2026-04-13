@@ -181,29 +181,13 @@ label[for="indexPathInput"]{
 <body>
   <div class="wrap">
     <section class="hero">
-      <h1>WGLT JSON Lesson Flow V3</h1>
-      <p class="sub">Now with a real loose-piece tray system and touch optimization. Instead of squeezing pieces into the same board, singles can park in left and right trays, and the drag surfaces are tuned for fingers on touch monitors, tablets, and phones. 🧩</p>
+      <h1>WGLT Black History Jigsaw Puzzles</h1>
+      <p class="sub">Explore 116 Black Historical Figures — scroll the lesson cards, pick a person, choose your puzzle size, and start learning! 🧩</p>
     </section>
 
     <div class="layout">
       <aside class="panel">
-        <h2>Choose Your Lesson</h2>
-
-        <div class="field">
-          <label for="indexPathInput">Subject index JSON path</label>
-          <div class="json-row">
-            <input id="indexPathInput" value="data/subjects-index.json" />
-            <button id="reloadIndexBtn" class="btn-secondary" style="width:auto;">Load</button>
-          </div>
-          <div class="tiny-note">This loads a small subject index, then each subject file loads only when needed.</div>
-        </div>
-
-        <div id="loaderBox" class="loader">Loading lesson library…</div>
-
-        <div class="field">
-          <label>Subject</label>
-          <div id="subjectList" class="subject-list"></div>
-        </div>
+        <h2>Black Historical Figures</h2>
 
         <div class="field">
           <label for="searchInput">Search lessons</label>
@@ -212,7 +196,7 @@ label[for="indexPathInput"]{
 
         <div class="field">
           <label>Lesson cards</label>
-          <div id="lessonCards" class="thumb-grid"></div>
+          <div id="lessonCards" class="thumb-grid" style="max-height:420px;overflow-y:auto;padding-right:4px;scrollbar-width:thin;scrollbar-color:rgba(244,180,0,.75) rgba(255,255,255,.08);"></div>
         </div>
 
         <div class="field">
@@ -330,25 +314,10 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
 
   <script>
     const STORAGE_KEY='wglt_json_v3_progress';
-    const FALLBACK_INDEX = {
-      subjects: [
-        { subject: "Black Historical Figures & Leaders", file: "data/subject-black-historical-figures.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Movies & TV Shows", file: "data/subject-movies.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Art by Black Artists", file: "data/subject-art-by-black-artists.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Civil Rights & Milestone Moments", file: "data/subject-civil-rights-and-milestone-moments.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Sport Icons", file: "data/subject-sport-icons.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Cultural & Musical Heritage", file: "data/subject-cultural-and-musical-heritage.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" },
-        { subject: "Crafts and Artistry", file: "data/subject-crafts-and-artistry.json", thumbnail: "https://static.wixstatic.com/media/80a41b_f236bbb29f8e4bb3bd37ed08f1ca8676~mv2.png" }
-      ]
-    };
-    let SUBJECT_INDEX = FALLBACK_INDEX.subjects;
-    const subjectCache = new Map();
-
-    const indexPathInput = document.getElementById('indexPathInput');
-    const reloadIndexBtn = document.getElementById('reloadIndexBtn');
-    const loaderBox = document.getElementById('loaderBox');
+    // Single subject — loaded from data file (edit JSON to update images/videos)
+    const DATA_FILE = 'data/subject-black-historical-figures.json';
+    let SUBJECT_DATA = { subject: 'Black Historical Figures & Leaders', items: [] };
     const searchInput = document.getElementById('searchInput');
-    const subjectList = document.getElementById('subjectList');
     const lessonCards = document.getElementById('lessonCards');
     const difficulty = document.getElementById('difficulty');
     const startBtn = document.getElementById('startBtn');
@@ -368,6 +337,16 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
     const leftTray = document.getElementById('leftTray');
     const rightTray = document.getElementById('rightTray');
     const parkingZone = document.getElementById('parkingZone');
+
+    // Re-layout trays whenever their container width changes (fixes first-render missing pieces)
+    let trayResizeTimer = null;
+    const trayResizeObserver = new ResizeObserver(()=>{
+      if(!pieces.length) return;
+      clearTimeout(trayResizeTimer);
+      trayResizeTimer = setTimeout(()=>organizeLoosePiecesToTrays(false), 60);
+    });
+    trayResizeObserver.observe(leftTray);
+    trayResizeObserver.observe(rightTray);
     const movesStat = document.getElementById('movesStat');
     const connectedStat = document.getElementById('connectedStat');
     const totalStat = document.getElementById('totalStat');
@@ -388,8 +367,8 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
     const finishQuizBtn = document.getElementById('finishQuizBtn');
     const resultsBox = document.getElementById('resultsBox');
 
-    let selectedSubjectIndex = 0, selectedItemIndex = 0, size = 4;
-    let currentSubjectData = null;
+    let selectedItemIndex = 0, size = 4;
+    let currentSubjectData = SUBJECT_DATA;
     let filteredItems = [];
     let boardRect = null, pieceWidth = 0, pieceHeight = 0, edgeCache = new Map();
     const BOARD_PAD = 32; // px padding inside the board border where pieces live
@@ -417,86 +396,27 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
     function awardBadge(name){ if(!unlockedBadges.includes(name)) unlockedBadges.push(name); updateProgressStats(); saveProgress() }
     function showCelebration(title,text,ms=2400,callback=null){ celebrationTitle.textContent=title; celebrationText.innerHTML=text; celebrationOverlay.classList.add('show'); if(autoAdvanceTimer) clearTimeout(autoAdvanceTimer); autoAdvanceTimer=setTimeout(()=>{ celebrationOverlay.classList.remove('show'); if(callback) callback() },ms) }
     function shuffleArray(arr){ const copy=arr.slice(); for(let i=copy.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [copy[i],copy[j]]=[copy[j],copy[i]] } return copy }
-    function currentSubjectMeta(){ return SUBJECT_INDEX[selectedSubjectIndex] || null }
     function getCurrentItem(){ return filteredItems[selectedItemIndex] || null }
 
-    function normalizeIndex(data){
-      if (data && Array.isArray(data.subjects)) return data.subjects;
-      if (Array.isArray(data)) return data;
-      throw new Error('Expected { "subjects": [...] } or plain array in subjects index.');
-    }
-    function normalizeSubject(data, fallbackName=''){
-      if (data && Array.isArray(data.items)) return data;
-      if (Array.isArray(data)) return { subject: fallbackName, items: data };
-      throw new Error('Expected { "subject": "...", "items": [...] } or array of items in subject file.');
-    }
-
-    async function loadIndex(path){
-      loaderBox.classList.add('show');
-      loaderBox.textContent = 'Loading subject index…';
-      try{
-        const res = await fetch(path, {cache:'no-store'});
-        if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    async function initSubject(){
+      try {
+        const res = await fetch(DATA_FILE, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
-        SUBJECT_INDEX = normalizeIndex(data);
-        selectedSubjectIndex = 0;
-        subjectCache.clear();
-        renderSubjects();
-        await loadSelectedSubject();
-        loaderBox.textContent = `Loaded ${SUBJECT_INDEX.length} subject entries.`;
-        setStatus('Subject index loaded. Choose a lesson card and start the lesson flow.');
-      }catch(err){
-        SUBJECT_INDEX = FALLBACK_INDEX.subjects;
-        subjectCache.clear();
-        renderSubjects();
-        await loadSelectedSubject();
-        loaderBox.textContent = 'Could not load external subject index, so fallback sample data is active.';
-        setStatus('External subject index could not be loaded here. Fallback sample data is active. Once hosted on GitHub Pages or Wix, your JSON files will load normally.');
+        SUBJECT_DATA = (data && Array.isArray(data.items)) ? data : { subject: data.subject || 'Black Historical Figures & Leaders', items: Array.isArray(data) ? data : [] };
+      } catch(err) {
+        console.warn('Could not load data file, using empty set:', err);
       }
-    }
-
-    async function loadSelectedSubject(){
-      const meta = currentSubjectMeta();
-      if(!meta){ currentSubjectData = {subject:'', items:[]}; filteredItems=[]; renderLessonCards(); refreshHeader(); renderPreview(); return; }
-
-      if(subjectCache.has(meta.subject)){
-        currentSubjectData = subjectCache.get(meta.subject);
-      }else{
-        try{
-          if(meta.file){
-            loaderBox.classList.add('show');
-            loaderBox.textContent = `Loading ${meta.subject}…`;
-            const res = await fetch(meta.file, {cache:'no-store'});
-            if(!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            currentSubjectData = normalizeSubject(data, meta.subject);
-          }else{
-            currentSubjectData = { subject: meta.subject, items: [] };
-          }
-        }catch(err){
-          currentSubjectData = { subject: meta.subject, items: [] };
-        }
-        subjectCache.set(meta.subject, currentSubjectData);
-      }
-
+      currentSubjectData = SUBJECT_DATA;
       selectedItemIndex = 0;
       applySearchFilter();
       refreshHeader();
       renderPreview();
       resetLesson();
-      loaderBox.classList.remove('show');
     }
 
-    function renderSubjects(){
-      subjectList.innerHTML='';
-      SUBJECT_INDEX.forEach((subject,index)=>{
-        const btn=document.createElement('button');
-        btn.className='pill-btn'+(index===selectedSubjectIndex?' active':'');
-        btn.textContent=subject.subject || `Subject ${index+1}`;
-        btn.addEventListener('click', async ()=>{ selectedSubjectIndex=index; renderSubjects(); hintVisible=false; await loadSelectedSubject(); setStatus('Subject selected. Pick a lesson card and start the lesson flow.') });
-        subjectList.appendChild(btn);
-      });
-    }
+    // stub — single subject, no list needed
+    function renderSubjects(){}
 
     function applySearchFilter(){
       const items = currentSubjectData?.items || [];
@@ -603,8 +523,9 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       }}
       scatterSinglesInBoard();
       pieces.forEach(piece=>{ createPieceElement(piece); const group={id:`g-${piece.id}`,pieceIds:[piece.id]}; groups.push(group); groupById.set(group.id,group); piece.groupId=group.id; positionPieceElement(piece) });
-      organizeLoosePiecesToTrays();
       updateStats();
+      // Double-RAF ensures DOM is fully painted before we measure tray clientWidth
+      requestAnimationFrame(()=>requestAnimationFrame(()=>organizeLoosePiecesToTrays()));
     }
 
     function createPieceElement(piece){
@@ -959,7 +880,7 @@ function parkConnectedGroups(){
     finishQuizBtn.addEventListener('click',finishQuiz);
     inlineVideo.addEventListener('play',()=>{ hideGhost(); });
     inlineVideo.addEventListener('ended',showQuiz);
-    reloadIndexBtn.addEventListener('click',()=>loadIndex(indexPathInput.value.trim()||'data/subjects-index.json'));
+    // single subject — no reload needed
     searchInput.addEventListener('input', ()=>{ selectedItemIndex = 0; applySearchFilter(); });
     let mobileResizeTimer=null;
     window.addEventListener('resize',()=>{
@@ -972,7 +893,7 @@ function parkConnectedGroups(){
       }, 180);
     });
 
-    loadSavedProgress(); updateProgressStats(); renderSubjects(); loadIndex(indexPathInput.value.trim()||'data/subjects-index.json');
+    loadSavedProgress(); updateProgressStats(); initSubject();
   </script>
 </body>
 </html>
