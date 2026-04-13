@@ -139,10 +139,8 @@
     .tray-box::-webkit-scrollbar{width:8px}
     .tray-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.35);border-radius:8px}
     .ghost-outline{
-      position:absolute;pointer-events:none;z-index:3;border:2px dashed rgba(43,210,120,.95);
-      background:rgba(43,210,120,.15);display:none;opacity:0;border-radius:10px;
-      box-shadow:0 0 18px rgba(43,210,120,.30) inset;
-    }
+      position:absolute;pointer-events:none;z-index:3;display:none;overflow:visible;
+      opacity:0;transition:opacity .12s ease;}
 
 
     body{
@@ -261,7 +259,7 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
 
           <div class="board-shell" id="boardShell">
             <div id="boardGrid" class="board-grid"></div>
-            <div id="ghostOutline" class="ghost-outline"></div>
+            <svg id="ghostOutline" class="ghost-outline" style="position:absolute;pointer-events:none;z-index:3;display:none;overflow:visible;" xmlns="http://www.w3.org/2000/svg"></svg>
             <video id="inlineVideo" class="board-video" playsinline controls></video>
             <div id="piecesLayer" class="pieces-layer"></div>
             <div id="celebrationOverlay" class="celebration-overlay">
@@ -480,21 +478,45 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
         ghostOutline.style.display='none';
         return;
       }
-      ghostOutline.style.left = `${BOARD_PAD + piece.col * pieceWidth}px`;
-      ghostOutline.style.top = `${BOARD_PAD + piece.row * pieceHeight}px`;
-      ghostOutline.style.width = `${pieceWidth}px`;
-      ghostOutline.style.height = `${pieceHeight}px`;
-      ghostOutline.style.opacity='1';
+      // Build the same jigsaw path as the actual piece
+      const top=edgeValue(piece.row,piece.col,'top');
+      const right=edgeValue(piece.row,piece.col,'right');
+      const bottom=edgeValue(piece.row,piece.col,'bottom');
+      const left=edgeValue(piece.row,piece.col,'left');
+      const {d,tab}=makePiecePath(pieceWidth,pieceHeight,top,right,bottom,left);
+
+      // Position SVG at piece's solved location, offset by tab so path aligns
+      const x=BOARD_PAD + piece.col*pieceWidth - tab;
+      const y=BOARD_PAD + piece.row*pieceHeight - tab;
+      const vw=pieceWidth+tab*2;
+      const vh=pieceHeight+tab*2;
+
+      ghostOutline.setAttribute('width', vw);
+      ghostOutline.setAttribute('height', vh);
+      ghostOutline.setAttribute('viewBox', `0 0 ${vw} ${vh}`);
+      ghostOutline.style.left = `${x}px`;
+      ghostOutline.style.top  = `${y}px`;
+
+      // Render fill + dashed stroke paths inside the SVG
+      ghostOutline.innerHTML = `
+        <path d="${d}" transform="translate(${tab},${tab})"
+          fill="rgba(43,210,120,.18)" stroke="none"/>
+        <path d="${d}" transform="translate(${tab},${tab})"
+          fill="none"
+          stroke="rgba(43,210,120,.95)"
+          stroke-width="2.5"
+          stroke-dasharray="6,4"
+          stroke-linejoin="round"
+          stroke-linecap="round"/>
+      `;
+
       ghostOutline.style.display='block';
+      ghostOutline.style.opacity='1';
     }
 
     function hideGhost(){
       ghostOutline.style.opacity='0';
       ghostOutline.style.display='none';
-      ghostOutline.style.left='-9999px';
-      ghostOutline.style.top='-9999px';
-      ghostOutline.style.width='0px';
-      ghostOutline.style.height='0px';
     }
 
     function updateBoardMetrics(){ boardRect=boardShell.getBoundingClientRect(); const innerW=boardRect.width-BOARD_PAD*2; const innerH=boardRect.height-BOARD_PAD*2; pieceWidth=innerW/size; pieceHeight=innerH/size }
