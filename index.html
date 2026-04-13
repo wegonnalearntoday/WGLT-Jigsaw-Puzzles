@@ -79,7 +79,8 @@
     .tray-box::-webkit-scrollbar-track,.parking-zone::-webkit-scrollbar-track{background:rgba(255,255,255,.08);border-radius:999px}
     .tray-box::-webkit-scrollbar-thumb,.parking-zone::-webkit-scrollbar-thumb{background:rgba(244,180,0,.75);border-radius:999px;border:2px solid rgba(255,255,255,.08)}
     .board-shell{position:relative;width:min(100%,var(--solveSize));aspect-ratio:1/1;margin:0 auto;background:radial-gradient(circle at center,rgba(255,255,255,.075),rgba(255,255,255,.03));border-radius:24px;border:2px solid rgba(255,255,255,.08);overflow:hidden}
-    .board-grid{position:absolute;inset:0;display:grid;pointer-events:none;z-index:1}
+    .board-shell::before{content:'';position:absolute;inset:28px;border-radius:14px;border:2px dashed rgba(244,180,0,.28);background:rgba(0,0,0,.18);pointer-events:none;z-index:0}
+    .board-grid{position:absolute;inset:28px;display:grid;pointer-events:none;z-index:2}
     .grid-cell{border:1px dashed rgba(255,255,255,.12)}
     .board-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .9s ease;z-index:2;background:#000}
     .pieces-layer{position:absolute;inset:0;z-index:4;overflow:visible;transition:opacity .8s ease,transform .8s ease}
@@ -391,6 +392,7 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
     let currentSubjectData = null;
     let filteredItems = [];
     let boardRect = null, pieceWidth = 0, pieceHeight = 0, edgeCache = new Map();
+    const BOARD_PAD = 32; // px padding inside the board border where pieces live
     let pieces = [], groups = [], pieceById = new Map(), groupById = new Map();
     let moves = 0, zCounter = 1000, activeGroup = null, dragMembers = [], dragStartPositions = [], dragPointerStartX = 0, dragPointerStartY = 0, puzzleStarted = false, hintVisible = false;
     let quizIndex = 0, quizScore = 0, quizAnswered = false, currentQuizOrder = [], totalScoreAcrossLessons = 0, lessonsCompleted = 0, unlockedBadges = [], autoAdvanceTimer = null;
@@ -558,8 +560,8 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
         ghostOutline.style.display='none';
         return;
       }
-      ghostOutline.style.left = `${piece.col * pieceWidth}px`;
-      ghostOutline.style.top = `${piece.row * pieceHeight}px`;
+      ghostOutline.style.left = `${BOARD_PAD + piece.col * pieceWidth}px`;
+      ghostOutline.style.top = `${BOARD_PAD + piece.row * pieceHeight}px`;
       ghostOutline.style.width = `${pieceWidth}px`;
       ghostOutline.style.height = `${pieceHeight}px`;
       ghostOutline.style.opacity='1';
@@ -575,7 +577,7 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       ghostOutline.style.height='0px';
     }
 
-    function updateBoardMetrics(){ boardRect=boardShell.getBoundingClientRect(); pieceWidth=boardRect.width/size; pieceHeight=boardRect.height/size }
+    function updateBoardMetrics(){ boardRect=boardShell.getBoundingClientRect(); const innerW=boardRect.width-BOARD_PAD*2; const innerH=boardRect.height-BOARD_PAD*2; pieceWidth=innerW/size; pieceHeight=innerH/size }
     function buildGrid(){ boardGrid.innerHTML=''; boardGrid.style.gridTemplateColumns=`repeat(${size},1fr)`; boardGrid.style.gridTemplateRows=`repeat(${size},1fr)`; for(let i=0;i<size*size;i++){ const cell=document.createElement('div'); cell.className='grid-cell'; boardGrid.appendChild(cell) } }
     function seededEdge(row,col,side){ const key=`${row}-${col}-${side}-${size}`; if(edgeCache.has(key)) return edgeCache.get(key); const seed=((row+1)*73856093)^((col+1)*19349663)^(side==='right'?83492791:15485863)^(size*11); const value=seed%2===0?1:-1; edgeCache.set(key,value); return value }
     function edgeValue(row,col,side){ if(side==='top'){ if(row===0) return 0; return -seededEdge(row-1,col,'bottom') } if(side==='left'){ if(col===0) return 0; return -seededEdge(row,col-1,'right') } if(side==='right'){ if(col===size-1) return 0; return seededEdge(row,col,'right') } if(side==='bottom'){ if(row===size-1) return 0; return seededEdge(row,col,'bottom') } return 0 }
@@ -610,8 +612,8 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       const svgNS='http://www.w3.org/2000/svg'; const svg=document.createElementNS(svgNS,'svg');
       svg.setAttribute('viewBox',`${-piece.tab} ${-piece.tab} ${pieceWidth+piece.tab*2} ${pieceHeight+piece.tab*2}`); svg.setAttribute('width','100%'); svg.setAttribute('height','100%');
       const defs=document.createElementNS(svgNS,'defs'), pattern=document.createElementNS(svgNS,'pattern'), patternId=`pat-${piece.id.replace(/[^a-zA-Z0-9]/g,'')}`;
-      pattern.setAttribute('id',patternId); pattern.setAttribute('patternUnits','userSpaceOnUse'); pattern.setAttribute('x',String(-piece.col*pieceWidth)); pattern.setAttribute('y',String(-piece.row*pieceHeight)); pattern.setAttribute('width',String(boardRect.width)); pattern.setAttribute('height',String(boardRect.height));
-      const image=document.createElementNS(svgNS,'image'); image.setAttribute('href',piece.imageUrl); image.setAttribute('x','0'); image.setAttribute('y','0'); image.setAttribute('width',String(boardRect.width)); image.setAttribute('height',String(boardRect.height)); image.setAttribute('preserveAspectRatio','none');
+      pattern.setAttribute('id',patternId); pattern.setAttribute('patternUnits','userSpaceOnUse'); pattern.setAttribute('x',String(-(piece.col*pieceWidth))); pattern.setAttribute('y',String(-(piece.row*pieceHeight))); const innerW=boardRect.width-BOARD_PAD*2; const innerH=boardRect.height-BOARD_PAD*2; pattern.setAttribute('width',String(innerW)); pattern.setAttribute('height',String(innerH));
+      const image=document.createElementNS(svgNS,'image'); image.setAttribute('href',piece.imageUrl); image.setAttribute('x','0'); image.setAttribute('y','0'); image.setAttribute('width',String(innerW)); image.setAttribute('height',String(innerH)); image.setAttribute('preserveAspectRatio','none');
       pattern.appendChild(image); defs.appendChild(pattern); svg.appendChild(defs);
       const path=document.createElementNS(svgNS,'path'); path.setAttribute('d',piece.path); path.setAttribute('transform',`translate(${piece.tab}, ${piece.tab})`); path.setAttribute('fill',`url(#${patternId})`);
       const stroke=document.createElementNS(svgNS,'path'); stroke.setAttribute('d',piece.path); stroke.setAttribute('transform',`translate(${piece.tab}, ${piece.tab})`); stroke.setAttribute('class','stroke');
@@ -641,8 +643,8 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       const pointerBoardY = e.clientY - boardBox.top;
 
       if (piece.zone === 'tray' || piece.zone === 'parking') {
-        const targetX = Math.max(-pieceWidth * 0.7, Math.min(boardRect.width - pieceWidth * 0.3, pointerBoardX - pieceWidth / 2));
-        const targetY = Math.max(-pieceHeight * 0.7, Math.min(boardRect.height - pieceHeight * 0.3, pointerBoardY - pieceHeight / 2));
+        const targetX = Math.max(BOARD_PAD - pieceWidth * 0.7, Math.min(boardRect.width - BOARD_PAD - pieceWidth * 0.3, pointerBoardX - pieceWidth / 2));
+        const targetY = Math.max(BOARD_PAD - pieceHeight * 0.7, Math.min(boardRect.height - BOARD_PAD - pieceHeight * 0.3, pointerBoardY - pieceHeight / 2));
         const shiftX = targetX - piece.x;
         const shiftY = targetY - piece.y;
 
@@ -679,7 +681,7 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       });
       if(dragMembers.length===1 && size>=2 && size<=4){
         const p = dragMembers[0];
-        const dist = Math.hypot(p.x - (p.col*pieceWidth), p.y - (p.row*pieceHeight));
+        const dist = Math.hypot(p.x - (BOARD_PAD + p.col*pieceWidth), p.y - (BOARD_PAD + p.row*pieceHeight));
         if(dist <= Math.min(pieceWidth,pieceHeight)*0.5){
           showGhostForPiece(p);
         } else {
@@ -715,10 +717,10 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
       const overflowX = pieceWidth * 0.7;
       const overflowY = pieceHeight * 0.7;
       let shiftX=0, shiftY=0;
-      if(bbox.minX < -overflowX) shiftX = -overflowX - bbox.minX;
-      if(bbox.minY < -overflowY) shiftY = -overflowY - bbox.minY;
-      if(bbox.maxX > boardRect.width + overflowX) shiftX = (boardRect.width + overflowX) - bbox.maxX;
-      if(bbox.maxY > boardRect.height + overflowY) shiftY = (boardRect.height + overflowY) - bbox.maxY;
+      if(bbox.minX < BOARD_PAD - overflowX) shiftX = (BOARD_PAD - overflowX) - bbox.minX;
+      if(bbox.minY < BOARD_PAD - overflowY) shiftY = (BOARD_PAD - overflowY) - bbox.minY;
+      if(bbox.maxX > boardRect.width - BOARD_PAD + overflowX) shiftX = (boardRect.width - BOARD_PAD + overflowX) - bbox.maxX;
+      if(bbox.maxY > boardRect.height - BOARD_PAD + overflowY) shiftY = (boardRect.height - BOARD_PAD + overflowY) - bbox.maxY;
       members.forEach(p=>{ p.x+=shiftX; p.y+=shiftY; positionPieceElement(p) })
     }
 
@@ -751,8 +753,8 @@ Connected groups can also be sent to the parking zone shelf below the board.<br>
 
     function scatterSinglesInBoard(){
       pieces.forEach(piece=>{
-        piece.x=Math.random()*(boardRect.width-pieceWidth);
-        piece.y=Math.random()*(boardRect.height-pieceHeight);
+        piece.x=BOARD_PAD + Math.random()*(boardRect.width - BOARD_PAD*2 - pieceWidth);
+        piece.y=BOARD_PAD + Math.random()*(boardRect.height - BOARD_PAD*2 - pieceHeight);
         piece.zone='board';
       });
     }
