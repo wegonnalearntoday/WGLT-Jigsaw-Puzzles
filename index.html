@@ -152,11 +152,6 @@
 
     #indexPathInput,#reloadIndexBtn,label[for="indexPathInput"]{display:none !important;}
 
-    /* Subject tabs */
-    .subject-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
-    .subject-tab{padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.04);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
-    .subject-tab:hover{background:rgba(255,255,255,.08);transform:none}
-    .subject-tab.active{background:rgba(244,180,0,.18);border-color:rgba(244,180,0,.6);color:var(--accent)}
 
     /* Timer */
     .timer-bar{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.04);border-radius:14px;padding:10px 14px;margin-bottom:10px}
@@ -195,18 +190,13 @@
   <section class="hero">
     <div class="hero-text">
       <h1>WGLT Black History Jigsaw Puzzles</h1>
-      <p class="sub">Explore Black History across 7 subjects — pick a category, choose a puzzle, and start learning! 🧩</p>
+      <p class="sub">Explore 116 Black Historical Figures — scroll the lesson cards, pick a person, choose your puzzle size, and start learning! 🧩</p>
     </div>
   </section>
 
   <div class="layout">
     <aside class="panel">
 
-      <!-- Subject Tabs -->
-      <div class="field">
-        <label>Subject Category</label>
-        <div id="subjectTabs" class="subject-tabs"></div>
-      </div>
 
       <div class="field">
         <label for="searchInput">Search lessons</label>
@@ -360,20 +350,10 @@
 <script>
   const STORAGE_KEY = 'wglt_json_v3_progress';
 
-  // All 7 subject files
-  const ALL_SUBJECTS = [
-    { label: 'Historical Figures', file: 'data/subject-black-historical-figures.json' },
-    { label: 'Movies & TV', file: 'data/subject-movies.json' },
-    { label: 'Art', file: 'data/subject-art-by-black-artists.json' },
-    { label: 'Civil Rights', file: 'data/subject-civil-rights-and-milestone-moments.json' },
-    { label: 'Sport Icons', file: 'data/subject-sport-icons.json' },
-    { label: 'Music & Culture', file: 'data/subject-cultural-and-musical-heritage.json' },
-    { label: 'Crafts', file: 'data/subject-crafts-and-artistry.json' },
-  ];
+  // Single subject — Black Historical Figures
+  const DATA_FILE = 'data/subject-black-historical-figures.json';
 
-  let loadedSubjects = {}; // cache: file -> data
-  let currentSubjectIndex = 0;
-  let currentSubjectData = { subject: '', items: [] };
+  let currentSubjectData = { subject: 'Black Historical Figures & Leaders', items: [] };
   let filteredItems = [];
   let selectedItemIndex = 0;
   let activeFilter = 'all'; // 'all' | 'starred' | 'completed'
@@ -456,7 +436,7 @@
 
   // ── Progress persistence ──────────────────────────────────────
   function puzzleKey(item) {
-    return `${ALL_SUBJECTS[currentSubjectIndex].file}|${item.title}`;
+    return `${DATA_FILE}|${item.title}`;
   }
   function loadSavedProgress() {
     try {
@@ -515,41 +495,15 @@
     });
   }
 
-  // ── Subject tabs ──────────────────────────────────────────────
-  function renderSubjectTabs() {
-    const container = document.getElementById('subjectTabs');
-    container.innerHTML = '';
-    ALL_SUBJECTS.forEach((s, i) => {
-      const btn = document.createElement('button');
-      btn.className = 'subject-tab' + (i === currentSubjectIndex ? ' active' : '');
-      btn.textContent = s.label;
-      btn.addEventListener('click', () => switchSubject(i));
-      container.appendChild(btn);
-    });
-  }
-  async function switchSubject(index) {
-    currentSubjectIndex = index;
-    renderSubjectTabs();
-    searchInput.value = '';
-    activeFilter = 'all';
-    updateFilterBtns();
-    await loadCurrentSubject();
-  }
-  async function loadCurrentSubject() {
-    const subj = ALL_SUBJECTS[currentSubjectIndex];
-    if (loadedSubjects[subj.file]) {
-      currentSubjectData = loadedSubjects[subj.file];
-    } else {
-      try {
-        const res = await fetch(subj.file, { cache: 'no-store' });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        currentSubjectData = (data && Array.isArray(data.items)) ? data : { subject: data.subject || subj.label, items: Array.isArray(data) ? data : [] };
-        loadedSubjects[subj.file] = currentSubjectData;
-      } catch (e) {
-        console.warn('Failed to load subject:', e);
-        currentSubjectData = { subject: subj.label, items: [] };
-      }
+  // ── Subject init ──────────────────────────────────────────────
+  async function initSubject() {
+    try {
+      const res = await fetch(DATA_FILE, { cache: 'no-store' });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      currentSubjectData = (data && Array.isArray(data.items)) ? data : { subject: data.subject || 'Black Historical Figures & Leaders', items: Array.isArray(data) ? data : [] };
+    } catch (e) {
+      console.warn('Could not load data file:', e);
     }
     selectedItemIndex = 0;
     applySearchFilter();
@@ -572,11 +526,10 @@
   function applySearchFilter() {
     const items = currentSubjectData?.items || [];
     const q = searchInput.value.trim().toLowerCase();
-    const subjFile = ALL_SUBJECTS[currentSubjectIndex].file;
     filteredItems = items.filter(item => {
       const blob = [item.title || '', item.description || '', ...(item.keywords || [])].join(' ').toLowerCase();
       const matchesQ = !q || blob.includes(q);
-      const key = `${subjFile}|${item.title}`;
+      const key = `${DATA_FILE}|${item.title}`;
       const matchesFilter =
         activeFilter === 'all' ? true :
         activeFilter === 'starred' ? starredPuzzles.has(key) :
@@ -596,9 +549,8 @@
       lessonCards.innerHTML = `<div class="tiny-note">No lessons matched this search.</div>`;
       return;
     }
-    const subjFile = ALL_SUBJECTS[currentSubjectIndex].file;
     filteredItems.forEach((item, index) => {
-      const key = `${subjFile}|${item.title}`;
+      const key = `${DATA_FILE}|${item.title}`;
       const isDone = completedPuzzles.has(key);
       const isStarred = starredPuzzles.has(key);
       const card = document.createElement('div');
@@ -663,46 +615,21 @@
 
   // ── Random puzzle ─────────────────────────────────────────────
   function pickRandomPuzzle() {
-    // Gather all loaded + available items across all subjects
-    const allItems = [];
-    ALL_SUBJECTS.forEach((s, si) => {
-      const data = loadedSubjects[s.file];
-      if (data && data.items) {
-        data.items.forEach((item, ii) => {
-          allItems.push({ subjectIndex: si, itemIndex: ii });
-        });
-      } else {
-        // Use current subject as fallback if others not loaded
-      }
-    });
-    // If only current subject loaded, pick from it
-    const pool = allItems.length > 0 ? allItems : currentSubjectData.items.map((_, ii) => ({ subjectIndex: currentSubjectIndex, itemIndex: ii }));
-    if (!pool.length) { setStatus('No puzzles available to randomize.'); return; }
-
-    const pick = pool[Math.floor(Math.random() * pool.length)];
-    if (pick.subjectIndex !== currentSubjectIndex) {
-      // Switch subject first, then auto-start
-      currentSubjectIndex = pick.subjectIndex;
-      renderSubjectTabs();
-      searchInput.value = '';
-      activeFilter = 'all';
-      updateFilterBtns();
-      loadCurrentSubject().then(() => {
-        selectedItemIndex = pick.itemIndex < filteredItems.length ? pick.itemIndex : 0;
-        renderLessonCards();
-        refreshHeader();
-        renderPreview();
-        autoStartCurrentLesson();
-        setStatus(`🎲 Random puzzle: ${getCurrentItem()?.title || ''}! Good luck!`);
-      });
-    } else {
-      selectedItemIndex = pick.itemIndex < filteredItems.length ? pick.itemIndex : Math.floor(Math.random() * filteredItems.length);
-      renderLessonCards();
-      refreshHeader();
-      renderPreview();
-      autoStartCurrentLesson();
-      setStatus(`🎲 Random puzzle: ${getCurrentItem()?.title || ''}! Good luck!`);
-    }
+    const items = currentSubjectData?.items || [];
+    if (!items.length) { setStatus('No puzzles available to randomize.'); return; }
+    // Pick a random index from ALL items (not just filtered)
+    const randomIndex = Math.floor(Math.random() * items.length);
+    // Find this item in filteredItems, or reset filter and use all
+    searchInput.value = '';
+    activeFilter = 'all';
+    updateFilterBtns();
+    applySearchFilter();
+    selectedItemIndex = randomIndex < filteredItems.length ? randomIndex : Math.floor(Math.random() * filteredItems.length);
+    renderLessonCards();
+    refreshHeader();
+    renderPreview();
+    autoStartCurrentLesson();
+    setStatus(`🎲 Random puzzle: ${getCurrentItem()?.title || ''}! Good luck!`);
   }
 
   // ── Timer ─────────────────────────────────────────────────────
@@ -1135,8 +1062,7 @@
   // ── Boot ──────────────────────────────────────────────────────
   loadSavedProgress();
   updateProgressStats();
-  renderSubjectTabs();
-  loadCurrentSubject();
+  initSubject();
 </script>
 </body>
 </html>
